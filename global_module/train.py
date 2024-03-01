@@ -110,11 +110,11 @@ def train(net, train_iter, valida_iter, loss, optimizer, device, epochs=30, earl
     d2l.plt.ylabel('train loss')
     # ls_plot = np.array(ls_plot)
 
-    test_loss = d2l.plt.subplot(224)
-    test_loss.set_title('valida_loss')
-    d2l.plt.plot(np.linspace(1, epoch, len(valida_loss_list)), valida_loss_list, color='gold')
-    d2l.plt.xlabel('epoch')
-    d2l.plt.ylabel('valida loss')
+    # test_loss = d2l.plt.subplot(224)
+    # test_loss.set_title('valida_loss')
+    # d2l.plt.plot(np.linspace(1, epoch, len(valida_loss_list)), valida_loss_list, color='gold')
+    # d2l.plt.xlabel('epoch')
+    # d2l.plt.ylabel('valida loss')
     # ls_plot = np.array(ls_plot)
 
     d2l.plt.show()
