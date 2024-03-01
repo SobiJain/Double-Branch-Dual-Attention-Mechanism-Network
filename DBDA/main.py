@@ -95,12 +95,12 @@ for index_iter in range(ITER):
     train_iter, valida_iter, test_iter, all_iter = generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE, total_indices, VAL_SIZE,
                   whole_data, PATCH_LENGTH, padded_data, INPUT_DIMENSION, batch_size, gt)
 
-    tic1 = time.clock()
+    tic1 = time.time
     train.train(net, train_iter, valida_iter, loss, optimizer, device, epochs=num_epochs)
-    toc1 = time.clock()
+    toc1 = time.time
 
     pred_test_fdssc = []
-    tic2 = time.clock()
+    tic2 = time.time
     with torch.no_grad():
         for X, y in test_iter:
             X = X.to(device)
@@ -108,7 +108,7 @@ for index_iter in range(ITER):
             y_hat = net(X)
             # print(net(X))
             pred_test_fdssc.extend(np.array(net(X).cpu().argmax(axis=1)))
-    toc2 = time.clock()
+    toc2 = time.time
     collections.Counter(pred_test_fdssc)
     gt_test = gt[test_indices] - 1
 
