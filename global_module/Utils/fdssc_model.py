@@ -5,17 +5,17 @@ from keras.layers import (
     Flatten,
     Dropout
 )
-from keras.layers.convolutional import (
+from keras.layers import (
     AveragePooling3D,
     Conv3D
 )
-from keras.layers.normalization import BatchNormalization
-from keras.layers.advanced_activations import PReLU, LeakyReLU, ELU, ThresholdedReLU
+from keras.layers import BatchNormalization
+from keras.layers import PReLU, LeakyReLU, ELU, ThresholdedReLU
 from keras.regularizers import l2
 from keras import backend as K
-from keras.layers.core import Reshape
+from keras.layers import Reshape
 from keras import regularizers
-from keras.layers.merge import concatenate
+from keras.layers import concatenate
 
 
 def bn_prelu(input):
