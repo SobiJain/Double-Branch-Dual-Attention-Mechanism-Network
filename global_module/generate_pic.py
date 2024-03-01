@@ -27,9 +27,9 @@ def load_dataset(Dataset):
         VALIDATION_SPLIT = 0.995
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
-    if Dataset == 'PU':
-        uPavia = sio.loadmat('../datasets/PaviaU.mat')
-        gt_uPavia = sio.loadmat('../datasets/PaviaU_gt.mat')
+    if Dataset == 'PC':
+        uPavia = sio.loadmat('../datasets/Pavia.mat')
+        gt_uPavia = sio.loadmat('../datasets/Pavia_gt.mat')
         data_hsi = uPavia['pavia']
         gt_hsi = gt_uPavia['pavia_gt']
         TOTAL_SIZE = 148152
