@@ -24,6 +24,14 @@ day_str = day.strftime('%m_%d_%H_%M')
 
 print('-----Importing Dataset-----')
 
+def params_count(model):
+    """
+    Compute the number of parameters.
+    Args:
+        model (model): model to count the number of parameters.
+    """
+    return np.sum([p.numel() for p in model.parameters()]).item()
+
 
 
 global Dataset  # UP,IN,KSC
@@ -112,6 +120,7 @@ for index_iter in range(ITER):
     collections.Counter(pred_test_fdssc)
     gt_test = gt[test_indices] - 1
 
+    print("param count: ", params_count(net))
 
     overall_acc_fdssc = metrics.accuracy_score(pred_test_fdssc, gt_test[:-VAL_SIZE])
     confusion_matrix_fdssc = metrics.confusion_matrix(pred_test_fdssc, gt_test[:-VAL_SIZE])
