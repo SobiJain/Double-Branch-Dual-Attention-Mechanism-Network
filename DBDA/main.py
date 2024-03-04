@@ -59,7 +59,7 @@ INPUT_DIMENSION = data_hsi.shape[2]
 ALL_SIZE = data_hsi.shape[0] * data_hsi.shape[1]
 VAL_SIZE = int(TRAIN_SIZE)
 TEST_SIZE = TOTAL_SIZE - TRAIN_SIZE
-
+print(TRAIN_SIZE, VAL_SIZE, TEST_SIZE, "-----")
 
 KAPPA = []
 OA = []
@@ -95,12 +95,12 @@ for index_iter in range(ITER):
     train_iter, valida_iter, test_iter, all_iter = generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE, total_indices, VAL_SIZE,
                   whole_data, PATCH_LENGTH, padded_data, INPUT_DIMENSION, batch_size, gt)
 
-    tic1 = time.clock()
+    tic1 = time.time()
     train.train(net, train_iter, valida_iter, loss, optimizer, device, epochs=num_epochs)
-    toc1 = time.clock()
+    toc1 = time.time()
 
     pred_test_fdssc = []
-    tic2 = time.clock()
+    tic2 = time.time()
     with torch.no_grad():
         for X, y in test_iter:
             X = X.to(device)
@@ -108,7 +108,7 @@ for index_iter in range(ITER):
             y_hat = net(X)
             # print(net(X))
             pred_test_fdssc.extend(np.array(net(X).cpu().argmax(axis=1)))
-    toc2 = time.clock()
+    toc2 = time.time()
     collections.Counter(pred_test_fdssc)
     gt_test = gt[test_indices] - 1
 
@@ -118,12 +118,14 @@ for index_iter in range(ITER):
     each_acc_fdssc, average_acc_fdssc = aa_and_each_accuracy(confusion_matrix_fdssc)
     kappa = metrics.cohen_kappa_score(pred_test_fdssc, gt_test[:-VAL_SIZE])
 
-    torch.save(net.state_dict(), "./net/" + str(round(overall_acc_fdssc, 3)) + '.pt')
+    # torch.save(net.state_dict(), "./net/" + str(round(overall_acc_fdssc, 3)) + '.pt')
     KAPPA.append(kappa)
     OA.append(overall_acc_fdssc)
     AA.append(average_acc_fdssc)
-    TRAINING_TIME.append(toc1 - tic1)
-    TESTING_TIME.append(toc2 - tic2)
+    diff = toc1 - tic1
+    TRAINING_TIME.append(diff)
+    diff = toc2 - tic2
+    TESTING_TIME.append(diff)
     ELEMENT_ACC[index_iter, :] = each_acc_fdssc
 
 print("--------" + net.name + " Training Finished-----------")
