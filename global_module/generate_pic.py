@@ -24,7 +24,7 @@ def load_dataset(Dataset):
         data_hsi = uPavia['paviaU']
         gt_hsi = gt_uPavia['paviaU_gt']
         TOTAL_SIZE = 42776
-        VALIDATION_SPLIT = 0.995
+        VALIDATION_SPLIT = 0.990
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'PC':
