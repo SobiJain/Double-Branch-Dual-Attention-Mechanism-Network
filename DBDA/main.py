@@ -12,6 +12,8 @@ import network
 import train
 from generate_pic import aa_and_each_accuracy, sampling,load_dataset, generate_png, generate_iter
 from Utils import fdssc_model, record, extract_samll_cubic
+from calflops import calculate_flops
+from torchvision import models
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -47,7 +49,7 @@ CLASSES_NUM = max(gt)
 print('The class numbers of the HSI data is:', CLASSES_NUM)
 
 print('-----Importing Setting Parameters-----')
-ITER = 10
+ITER = 1
 PATCH_LENGTH = 4
 # number of training samples per class
 #lr, num_epochs, batch_size = 0.001, 200, 32
@@ -102,7 +104,7 @@ for index_iter in range(ITER):
 
     train_iter, valida_iter, test_iter, all_iter = generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE, total_indices, VAL_SIZE,
                   whole_data, PATCH_LENGTH, padded_data, INPUT_DIMENSION, batch_size, gt)
-
+    print(whole_data.shape)
     tic1 = time.time()
     train.train(net, train_iter, valida_iter, loss, optimizer, device, epochs=num_epochs)
     toc1 = time.time()
@@ -120,8 +122,6 @@ for index_iter in range(ITER):
     collections.Counter(pred_test_fdssc)
     gt_test = gt[test_indices] - 1
 
-    print("param count: ", params_count(net))
-
     overall_acc_fdssc = metrics.accuracy_score(pred_test_fdssc, gt_test[:-VAL_SIZE])
     confusion_matrix_fdssc = metrics.confusion_matrix(pred_test_fdssc, gt_test[:-VAL_SIZE])
     each_acc_fdssc, average_acc_fdssc = aa_and_each_accuracy(confusion_matrix_fdssc)
@@ -138,6 +138,16 @@ for index_iter in range(ITER):
     ELEMENT_ACC[index_iter, :] = each_acc_fdssc
 
 print("--------" + net.name + " Training Finished-----------")
+
+print("param count: ", params_count(net))
+
+input_shape = (batch_size,1,PATCH_LENGTH,PATCH_LENGTH, img_channels)
+flops, macs, params = calculate_flops(model=net, 
+                                      input_shape=input_shape,
+                                      output_as_string=True,
+                                      output_precision=4)
+print("Alexnet FLOPs:%s   MACs:%s   Params:%s \n" %(flops, macs, params))
+
 record.record_output(OA, AA, KAPPA, ELEMENT_ACC, TRAINING_TIME, TESTING_TIME,
                      'records/' + net.name + day_str + '_' + Dataset + 'split：' + str(VALIDATION_SPLIT) + 'lr：' + str(lr) + '.txt')
 
