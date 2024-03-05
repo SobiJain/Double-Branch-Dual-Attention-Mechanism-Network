@@ -208,6 +208,10 @@ class DBDA_network(nn.Module):
         self.conv15 = nn.Conv3d(in_channels=60, out_channels=60,
                                 kernel_size=(1, 1, kernel_3d), stride=(1, 1, 1)) # kernel size随数据变化
 
+        # spectral feature enhancement stage
+        self.conv16 = nn.Conv2d(60, 1,
+                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+
         #注意力机制模块
 
         #self.max_pooling1 = nn.MaxPool3d(kernel_size=(7, 7, 1))
