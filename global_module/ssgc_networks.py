@@ -43,9 +43,9 @@ class SSGC_network(nn.Module):
                                     nn.BatchNorm3d(60, eps=0.001, momentum=0.1, affine=True),
                                     nn.ReLU(inplace=True)
         )
-        kernel_3d = math.floor((band - 6) / 2)
+
         self.conv15 = nn.Conv3d(in_channels=60, out_channels=60,
-                                kernel_size=(1, 1, kernel_3d), stride=(1, 1, 1)) # kernel size随数据变化
+                                kernel_size=(1, 1, 70), stride=(1, 1, 1)) # kernel size随数据变化
 
         # spectral feature enhancement stage
         self.conv16 = nn.Conv2d(60, 1,
@@ -129,8 +129,10 @@ class SSGC_network(nn.Module):
         print('x13', x13.shape)
 
         x14 = torch.cat((x11, x12, x13), dim=1)
+        print('x14', x14.shape)
         x14 = self.batch_norm13(x14)
         x14 = self.conv14(x14)
+        print('x14', x14.shape)
 
         x15 = torch.cat((x11, x12, x13, x14), dim=1)
         print('x15', x15.shape)
@@ -138,14 +140,18 @@ class SSGC_network(nn.Module):
         x16 = self.batch_norm14(x15)
         x16 = self.conv15(x16)
         print('x16', x16.shape)  # 7*7*97, 60
+        x16 = x16.squeeze(-1)
+        print('x16', x16.shape)
 
         #subbranch 1
         x17 = self.conv16(x16)
-        x17 = x17.reshape(1,1,x17.shape[0]*x17.shape[1])
+        print('x17', x17.shape)
+        x17 = x17.reshape(x17.shape[0],1,1,x17.shape[2]*x17.shape[3])
         x17 = self.softmax11(x17)
+        print('x17', x17.shape)
 
         #subbranch 2
-        x18 = x16.view(x16.shape[0]*x16.shape[1], 60)
+        x18 = x16.view(x16.shape[0], x16.shape[2] *x16.shape[3], 60)
 
         #multiplying both branches
         x19 = torch.mul(x17, x18)
