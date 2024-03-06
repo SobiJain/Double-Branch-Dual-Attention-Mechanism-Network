@@ -52,7 +52,7 @@ class SSGC_network(nn.Module):
         self.conv16 = nn.Conv2d(60, 1,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
         
-        self.softmax1 = nn.Softmax()
+        self.softmax11 = nn.Softmax()
 
         self.conv17 = nn.Conv2d(60, 60/self.r,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
@@ -89,8 +89,31 @@ class SSGC_network(nn.Module):
                                 kernel_size=(3, 3, 1), stride=(1, 1, 1))
 
         # spatial branch enhancement
-        self.global_pooling = nn.AdaptiveAvgPool3d(1)
+        self.global_pooling21 = nn.AdaptiveAvgPool2d((1,1))
+        self.softmax21 = nn.Softmax()
 
+        self.conv25 = nn.Conv2d(25, 25/self.r,
+                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+
+        self.layer_norm21 = nn.Sequential(
+                                    nn.LayerNorm(25/self.r, eps=0.001, momentum=0.1, affine=True),
+                                    nn.ReLU(inplace=True)
+        )
+
+        self.conv26 = nn.Conv2d(25/self.r, 25,
+                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+
+        #feature fusion classification stage
+        self.layer_norm31 = nn.Sequential(
+                                    nn.LayerNorm(60, eps=0.001, momentum=0.1, affine=True),
+                                    nn.ReLU(inplace=True)
+        )
+        self.global_pooling31 = nn.AdaptiveAvgPool2d((1,1))
+
+        self.full_connection = nn.Sequential(
+            nn.Linear(120, classes),
+            nn.Softmax()
+        )
 
     def forward(self, X):
         # spectral
@@ -117,10 +140,22 @@ class SSGC_network(nn.Module):
         x16 = self.conv15(x16)
         #print('x16', x16.shape)  # 7*7*97, 60
 
-        #print('x16', x16.shape)
-        # 光谱注意力通道
-        x1 = self.attention_spectral(x16)
-        x1 = torch.mul(x1, x16)
+        #subbranch 1
+        x17 = self.conv16(x16)
+        x17 = x17.reshape(1,1,x17.shape[0]*x17.shape[1])
+        x17 = self.softmax11(x17)
+
+        #subbranch 2
+        x18 = x16.view(x16.shape[0]*x16.shape[1], 60)
+
+        #multiplying both branches
+        x19 = torch.mul(x17, x18)
+        x19 = self.conv17(x19)
+        x19 = self.layer_norm11(x19)
+        x19 = self.conv18(x19)
+
+        # adding both initial input and multiplication of the two branches
+        x20 = x19 + x16
 
 
         # spatial
@@ -140,27 +175,39 @@ class SSGC_network(nn.Module):
         x25 = torch.cat((x21, x22, x23, x24), dim=1)
         #print('x25', x25.shape)
         
+        #subbranch 1
+        x26 = x25.permute(2,0,1)
+        x26 = self.global_pooling21(x26)
+        x26 = x26.permute(1,2,0)
+        x26 = self.softmax21(x26)
 
-        # 空间注意力机制
-        x2 = self.attention_spatial(x25)
-        x2 = torch.mul(x2, x25)
+        #subbranch 2
+        x27 = x25.reshape(60, x25.shape[0]*x25.shape[1])
 
-        # model1
-        x1 = self.global_pooling(x1)
-        x1 = x1.squeeze(-1).squeeze(-1).squeeze(-1)
-        x2= self.global_pooling(x2)
-        x2 = x2.squeeze(-1).squeeze(-1).squeeze(-1)
+        #mat mul of both branches
+        x28 = torch.mul(x26, x27)
+        x28 = self.conv25(x28)
+        x28 = self.layer_norm21(x28)
+        x28 = self.conv26(x28)
 
-        x_pre = torch.cat((x1, x2), dim=1)
-        #print('x_pre', x_pre.shape)
+        x29 = x28.reshape(math.sqrt(x28.shape[2]), math.sqrt(x28.shape[2]), 1)
 
-        # model2
-        # x1 = torch.mul(x2, x16)
-        # x2 = torch.mul(x2, x25)
-        # x_pre = x1 + x2
-        #
-        #
-        # x_pre = x_pre.view(x_pre.shape[0], -1)
-        output = self.full_connection(x_pre)
-        # output = self.fc(x_pre)
+        #adding input and multiplication of the two branches
+        x30 = x29 + x25
+
+        # feature fusion
+
+        x20 = x20.permute(2,0,1)
+        x20 = self.global_pooling31(x20)
+        x20 = x20.permute(1,2,0)
+        x20 = x20.view(1,60)
+
+        x30 = x30.permute(2,0,1)
+        x30 = self.global_pooling31(x30)
+        x30 = x30.permute(1,2,0)
+        x30 = x30.view(1,60)
+
+        x41 = torch.cat((x30, x20))
+        output = self.full_connection(x41)
+
         return output
