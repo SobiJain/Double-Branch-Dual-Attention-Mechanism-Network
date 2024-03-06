@@ -151,7 +151,8 @@ class SSGC_network(nn.Module):
         print('x17', x17.shape)
 
         #subbranch 2
-        x18 = x16.view(x16.shape[0], x16.shape[2] *x16.shape[3], 60)
+        x18 = x16.view(x16.shape[0], 60, x16.shape[2] *x16.shape[3])
+        print('x18', x18.shape)
 
         #multiplying both branches
         x19 = torch.mul(x17, x18)
