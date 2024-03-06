@@ -1,6 +1,5 @@
 import torch
 from torch import nn
-from attontion import PAM_Module, CAM_Module
 import math
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
@@ -54,15 +53,15 @@ class SSGC_network(nn.Module):
         
         self.softmax11 = nn.Softmax()
 
-        self.conv17 = nn.Conv2d(60, 60/self.r,
+        self.conv17 = nn.Conv2d(60, 60//self.r,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
 
         self.layer_norm11 = nn.Sequential(
-                                    nn.LayerNorm(60/self.r, eps=0.001, momentum=0.1, affine=True),
+                                    nn.LayerNorm(60//self.r, eps=0.001, elementwise_affine=True),
                                     nn.ReLU(inplace=True)
         )
 
-        self.conv18 = nn.Conv2d(60/self.r, 60,
+        self.conv18 = nn.Conv2d(60//self.r, 60,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
 
         # Spatial Branch
@@ -70,19 +69,19 @@ class SSGC_network(nn.Module):
                                 kernel_size=(1, 1, band), stride=(1, 1, 1))
         # Dense block
         self.batch_norm21 = nn.Sequential(
-                                    nn.BatchNorm3d(24, eps=0.001, momentum=0.1, affine=True),
+                                    nn.BatchNorm3d(24, eps=0.001, affine=True),
                                     nn.ReLU(inplace=True)
         )
         self.conv22 = nn.Conv3d(in_channels=24, out_channels=12, padding=(1, 1, 0),
                                 kernel_size=(3, 3, 1), stride=(1, 1, 1))
         self.batch_norm22 = nn.Sequential(
-                                    nn.BatchNorm3d(36, eps=0.001, momentum=0.1, affine=True),
+                                    nn.BatchNorm3d(36, eps=0.001,  affine=True),
                                     nn.ReLU(inplace=True)
         )
         self.conv23 = nn.Conv3d(in_channels=36, out_channels=12, padding=(1, 1, 0),
                                 kernel_size=(3, 3, 1), stride=(1, 1, 1))
         self.batch_norm23 = nn.Sequential(
-                                    nn.BatchNorm3d(48, eps=0.001, momentum=0.1, affine=True),
+                                    nn.BatchNorm3d(48, eps=0.001, affine=True),
                                     nn.ReLU(inplace=True)
         )
         self.conv24 = nn.Conv3d(in_channels=48, out_channels=12, padding=(1, 1, 0),
@@ -92,20 +91,20 @@ class SSGC_network(nn.Module):
         self.global_pooling21 = nn.AdaptiveAvgPool2d((1,1))
         self.softmax21 = nn.Softmax()
 
-        self.conv25 = nn.Conv2d(25, 25/self.r,
+        self.conv25 = nn.Conv2d(25, 25//self.r,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
 
         self.layer_norm21 = nn.Sequential(
-                                    nn.LayerNorm(25/self.r, eps=0.001, momentum=0.1, affine=True),
+                                    nn.LayerNorm(25//self.r, eps=0.001, elementwise_affine=True),
                                     nn.ReLU(inplace=True)
         )
 
-        self.conv26 = nn.Conv2d(25/self.r, 25,
+        self.conv26 = nn.Conv2d(25//self.r, 25,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
 
         #feature fusion classification stage
         self.layer_norm31 = nn.Sequential(
-                                    nn.LayerNorm(60, eps=0.001, momentum=0.1, affine=True),
+                                    nn.LayerNorm(60, eps=0.001, elementwise_affine=True),
                                     nn.ReLU(inplace=True)
         )
         self.global_pooling31 = nn.AdaptiveAvgPool2d((1,1))
@@ -118,27 +117,27 @@ class SSGC_network(nn.Module):
     def forward(self, X):
         # spectral
         x11 = self.conv11(X)
-        #print('x11', x11.shape)
+        print('x11', x11.shape)
         x12 = self.batch_norm11(x11)
         x12 = self.conv12(x12)
-        #print('x12', x12.shape)
+        print('x12', x12.shape)
 
         x13 = torch.cat((x11, x12), dim=1)
-        #print('x13', x13.shape)
+        print('x13', x13.shape)
         x13 = self.batch_norm12(x13)
         x13 = self.conv13(x13)
-        #print('x13', x13.shape)
+        print('x13', x13.shape)
 
         x14 = torch.cat((x11, x12, x13), dim=1)
         x14 = self.batch_norm13(x14)
         x14 = self.conv14(x14)
 
         x15 = torch.cat((x11, x12, x13, x14), dim=1)
-        # print('x15', x15.shape)
+        print('x15', x15.shape)
 
         x16 = self.batch_norm14(x15)
         x16 = self.conv15(x16)
-        #print('x16', x16.shape)  # 7*7*97, 60
+        print('x16', x16.shape)  # 7*7*97, 60
 
         #subbranch 1
         x17 = self.conv16(x16)
