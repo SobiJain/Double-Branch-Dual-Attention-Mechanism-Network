@@ -18,33 +18,33 @@ class SSGC_network(nn.Module):
         self.r = 2
         # spectral branch
 
-        self.conv11 = nn.Conv3d(in_channels=1, out_channels=24,
+        self.conv11 = nn.Conv3d(in_channels=1, out_channels=24, padding = "valid",
                                 kernel_size=(1, 1, 7), stride=(1, 1, 2))
         # Dense block
         self.batch_norm11 = nn.Sequential(
                                     nn.BatchNorm3d(24,  eps=0.001, momentum=0.1, affine=True), # 动量默认值为0.1
                                     nn.ReLU(inplace=True)
         )
-        self.conv12 = nn.Conv3d(in_channels=24, out_channels=12, padding=(0, 0, 3),
+        self.conv12 = nn.Conv3d(in_channels=24, out_channels=12, padding="same",
                                 kernel_size=(1, 1, 7), stride=(1, 1, 1))
         self.batch_norm12 = nn.Sequential(
                                     nn.BatchNorm3d(36, eps=0.001, momentum=0.1, affine=True),
                                     nn.ReLU(inplace=True)
         )
-        self.conv13 = nn.Conv3d(in_channels=36, out_channels=12, padding=(0, 0, 3),
+        self.conv13 = nn.Conv3d(in_channels=36, out_channels=12, padding="same",
                                 kernel_size=(1, 1, 7), stride=(1, 1, 1))
         self.batch_norm13 = nn.Sequential(
                                     nn.BatchNorm3d(48, eps=0.001, momentum=0.1, affine=True),
                                     nn.ReLU(inplace=True)
         )
-        self.conv14 = nn.Conv3d(in_channels=48, out_channels=12, padding=(0, 0, 3),
+        self.conv14 = nn.Conv3d(in_channels=48, out_channels=12, padding="same",
                                 kernel_size=(1, 1, 7), stride=(1, 1, 1))
         self.batch_norm14 = nn.Sequential(
                                     nn.BatchNorm3d(60, eps=0.001, momentum=0.1, affine=True),
                                     nn.ReLU(inplace=True)
         )
 
-        self.conv15 = nn.Conv3d(in_channels=60, out_channels=60,
+        self.conv15 = nn.Conv3d(in_channels=60, out_channels=60, padding = "valid",
                                 kernel_size=(1, 1, 49), stride=(1, 1, 1)) # kernel size随数据变化
 
         # spectral feature enhancement stage
@@ -65,26 +65,26 @@ class SSGC_network(nn.Module):
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
 
         # Spatial Branch
-        self.conv21 = nn.Conv3d(in_channels=1, out_channels=24,
+        self.conv21 = nn.Conv3d(in_channels=1, out_channels=24, padding = "valid",
                                 kernel_size=(1, 1, band), stride=(1, 1, 1))
         # Dense block
         self.batch_norm21 = nn.Sequential(
                                     nn.BatchNorm3d(24, eps=0.001, affine=True),
                                     nn.ReLU(inplace=True)
         )
-        self.conv22 = nn.Conv3d(in_channels=24, out_channels=12, padding=(1, 1, 0),
+        self.conv22 = nn.Conv3d(in_channels=24, out_channels=12, padding="same",
                                 kernel_size=(3, 3, 1), stride=(1, 1, 1))
         self.batch_norm22 = nn.Sequential(
                                     nn.BatchNorm3d(36, eps=0.001,  affine=True),
                                     nn.ReLU(inplace=True)
         )
-        self.conv23 = nn.Conv3d(in_channels=36, out_channels=12, padding=(1, 1, 0),
+        self.conv23 = nn.Conv3d(in_channels=36, out_channels=12, padding="same",
                                 kernel_size=(3, 3, 1), stride=(1, 1, 1))
         self.batch_norm23 = nn.Sequential(
                                     nn.BatchNorm3d(48, eps=0.001, affine=True),
                                     nn.ReLU(inplace=True)
         )
-        self.conv24 = nn.Conv3d(in_channels=48, out_channels=12, padding=(1, 1, 0),
+        self.conv24 = nn.Conv3d(in_channels=48, out_channels=12, padding="same",
                                 kernel_size=(3, 3, 1), stride=(1, 1, 1))
 
         # spatial branch enhancement
