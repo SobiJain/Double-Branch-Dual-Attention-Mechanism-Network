@@ -49,12 +49,12 @@ class SSGC_network(nn.Module):
 
         # spectral feature enhancement stage
         self.conv16 = nn.Conv2d(60, 1,
-                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+                    kernel_size=(1, 1), stride=(1,1))
         
         self.softmax11 = nn.Softmax()
 
         self.conv17 = nn.Conv2d(60, 60//self.r,
-                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+                    kernel_size=(1, 1), stride=(1,1))
 
         self.layer_norm11 = nn.Sequential(
                                     nn.LayerNorm(60//self.r, eps=0.001, elementwise_affine=True),
@@ -62,7 +62,7 @@ class SSGC_network(nn.Module):
         )
 
         self.conv18 = nn.Conv2d(60//self.r, 60,
-                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+                    kernel_size=(1, 1), stride=(1,1))
 
         # Spatial Branch
         self.conv21 = nn.Conv3d(in_channels=1, out_channels=24, padding = "valid",
@@ -92,7 +92,7 @@ class SSGC_network(nn.Module):
         self.softmax21 = nn.Softmax()
 
         self.conv25 = nn.Conv2d(81, 81//self.r,
-                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+                    kernel_size=(1, 1), stride=(1,1))
 
         self.layer_norm21 = nn.Sequential(
                                     nn.LayerNorm(81//self.r, eps=0.001, elementwise_affine=True),
@@ -100,7 +100,7 @@ class SSGC_network(nn.Module):
         )
 
         self.conv26 = nn.Conv2d(81//self.r, 81,
-                    kernel_size=(1, 1), padding="valid", stride=(1,1))
+                    kernel_size=(1, 1), stride=(1,1))
 
         #feature fusion classification stage
         self.layer_norm31 = nn.Sequential(
