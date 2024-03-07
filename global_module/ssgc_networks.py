@@ -15,7 +15,7 @@ class SSGC_network(nn.Module):
         super(SSGC_network, self).__init__()
 
         self.name = "SSGC"
-        self.r = 2
+        self.r = 3
         # spectral branch
 
         self.conv11 = nn.Conv3d(in_channels=1, out_channels=24,
@@ -91,15 +91,15 @@ class SSGC_network(nn.Module):
         self.global_pooling21 = nn.AdaptiveAvgPool2d(output_size=(1, 1))
         self.softmax21 = nn.Softmax()
 
-        self.conv25 = nn.Conv2d(25, 25//self.r,
+        self.conv25 = nn.Conv2d(81, 81//self.r,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
 
         self.layer_norm21 = nn.Sequential(
-                                    nn.LayerNorm(25//self.r, eps=0.001, elementwise_affine=True),
+                                    nn.LayerNorm(81//self.r, eps=0.001, elementwise_affine=True),
                                     nn.ReLU(inplace=True)
         )
 
-        self.conv26 = nn.Conv2d(25//self.r, 25,
+        self.conv26 = nn.Conv2d(81//self.r, 81,
                     kernel_size=(1, 1), padding="valid", stride=(1,1))
 
         #feature fusion classification stage
@@ -117,65 +117,65 @@ class SSGC_network(nn.Module):
     def forward(self, X):
         # spectral
         x11 = self.conv11(X)
-        print('x11', x11.shape)
+        # print('x11', x11.shape)
         x12 = self.batch_norm11(x11)
         x12 = self.conv12(x12)
-        print('x12', x12.shape)
+        # print('x12', x12.shape)
 
         x13 = torch.cat((x11, x12), dim=1)
-        print('x13', x13.shape)
+        # print('x13', x13.shape)
         x13 = self.batch_norm12(x13)
         x13 = self.conv13(x13)
-        print('x13', x13.shape)
+        # print('x13', x13.shape)
 
         x14 = torch.cat((x11, x12, x13), dim=1)
-        print('x14', x14.shape)
+        # print('x14', x14.shape)
         x14 = self.batch_norm13(x14)
         x14 = self.conv14(x14)
-        print('x14', x14.shape)
+        # print('x14', x14.shape)
 
         x15 = torch.cat((x11, x12, x13, x14), dim=1)
-        print('x15', x15.shape)
+        # print('x15', x15.shape)
 
         x16 = self.batch_norm14(x15)
         x16 = self.conv15(x16)
-        print('x16', x16.shape)  # 7*7*97, 60
+        # print('x16', x16.shape)  # 7*7*97, 60
         x16 = x16.squeeze(-1)
-        print('x16', x16.shape)
+        # print('x16', x16.shape)
 
         #subbranch 1
         x17 = self.conv16(x16)
-        print('x17', x17.shape)
+        # print('x17', x17.shape)
         x17 = x17.reshape(x17.shape[0],x17.shape[2]*x17.shape[3],1,1)
         x17 = self.softmax11(x17)
-        print('x17', x17.shape)
+        # print('x17', x17.shape)
 
         #subbranch 2
         x18 = x16.view(x16.shape[0], 60, x16.shape[2] *x16.shape[3])
-        print('x18', x18.shape)
+        # print('x18', x18.shape)
 
         #multiplying both branches
         x17 = x17.reshape(x17.shape[0],1,1, x17.shape[1])
         x18 = x18.reshape(x18.shape[0],1, x18.shape[2], x18.shape[1])
         x19 = torch.matmul(x17, x18)
-        print('x19', x19.shape)
+        # print('x19', x19.shape)
         x19 = x19.reshape(x19.shape[0], x19.shape[3], 1, 1)
-        print('x19', x19.shape)
+        # print('x19', x19.shape)
 
         x19 = self.conv17(x19)
-        print('x19', x19.shape)
+        # print('x19', x19.shape)
 
         x19 = x19.view(x19.shape[0], x19.shape[1])
         x19 = self.layer_norm11(x19)
-        print('x19', x19.shape)
+        # print('x19', x19.shape)
 
         x19 = x19.view(x19.shape[0], x19.shape[1],1,1)
         x19 = self.conv18(x19)
-        print('x19', x19.shape)
+        # print('x19', x19.shape)
 
         # adding both initial input and multiplication of the two branches
         x20 = x19 + x16
-        print('x20', x20.shape)
+        # print('x20', x20.shape)
 
         # spatial
         #print('x', X.shape)
@@ -192,44 +192,55 @@ class SSGC_network(nn.Module):
         x24 = self.conv24(x24)
 
         x25 = torch.cat((x21, x22, x23, x24), dim=1)
-        print('x25', x25.shape)
+        # print('x25', x25.shape)
         x25 = x25.squeeze(-1)
-        print('x25', x25.shape)
+        # print('x25', x25.shape)
 
         #subbranch 1
         x26 = self.global_pooling21(x25)
         x26 = torch.mean(x26, dim=(2, 3), keepdim=True)
         x26 = self.softmax21(x26)
-        print('x26', x26.shape)
+        # print('x26', x26.shape)
 
-        #subbranch 2
-        x27 = x25.reshape(x25.shape[0], x25.shape[1], x25.shape[3]*x25.shape[2])
+        x26 = x26.reshape(x26.shape[0], 1,1, x26.shape[1])
+        # print('x26', x26.shape)
         
+        #subbranch 2
+        x27 = x25.reshape(x25.shape[0], 1, x25.shape[1], x25.shape[3]*x25.shape[2])
+        # print('x27', x27.shape)
 
         #mat mul of both branches
-        x28 = torch.mul(x26, x27)
+        x28 = torch.matmul(x26, x27)
+        x28 = x28.reshape(x28.shape[0], x28.shape[3], 1,1)
         x28 = self.conv25(x28)
+        # print('x28', x28.shape)
+        x28 = x28.view(x28.shape[0], x28.shape[1])
         x28 = self.layer_norm21(x28)
+        x28 = x28.view(x28.shape[0], x28.shape[1], 1, 1)
         x28 = self.conv26(x28)
+        # print('x28', x28.shape)
 
-        x29 = x28.reshape(math.sqrt(x28.shape[2]), math.sqrt(x28.shape[2]), 1)
+        x29 = x28.reshape(x28.shape[0], 1, int(math.sqrt(x28.shape[1])), int(math.sqrt(x28.shape[1])))
 
         #adding input and multiplication of the two branches
         x30 = x29 + x25
+        # print('x30', x30.shape)
 
         # feature fusion
 
-        x20 = x20.permute(2,0,1)
         x20 = self.global_pooling31(x20)
-        x20 = x20.permute(1,2,0)
-        x20 = x20.view(1,60)
+        x20 = x20.squeeze(-1)
+        # print('x20', x20.shape)
 
-        x30 = x30.permute(2,0,1)
         x30 = self.global_pooling31(x30)
-        x30 = x30.permute(1,2,0)
-        x30 = x30.view(1,60)
+        x30 = x30.squeeze(-1)
+        # print('x30', x30.shape)
 
-        x41 = torch.cat((x30, x20))
+        x41 = torch.cat((x30, x20), dim = 1)
+        x41 = x41.reshape(x41.shape[0],x41.shape[2], x41.shape[1])
+        # print('x41', x41.shape)
         output = self.full_connection(x41)
+        output = output.view(output.shape[0], output.shape[2])
+        # print(output.shape)
 
         return output
