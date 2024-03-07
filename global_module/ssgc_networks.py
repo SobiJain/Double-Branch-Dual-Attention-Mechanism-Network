@@ -15,7 +15,7 @@ class SSGC_network(nn.Module):
         super(SSGC_network, self).__init__()
 
         self.name = "SSGC"
-        self.r = 3
+        self.r = 2
         # spectral branch
 
         self.conv11 = nn.Conv3d(in_channels=1, out_channels=24,
@@ -45,7 +45,7 @@ class SSGC_network(nn.Module):
         )
 
         self.conv15 = nn.Conv3d(in_channels=60, out_channels=60,
-                                kernel_size=(1, 1, 70), stride=(1, 1, 1)) # kernel size随数据变化
+                                kernel_size=(1, 1, 49), stride=(1, 1, 1)) # kernel size随数据变化
 
         # spectral feature enhancement stage
         self.conv16 = nn.Conv2d(60, 1,
