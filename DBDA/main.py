@@ -53,7 +53,7 @@ ITER = 1
 PATCH_LENGTH = 4
 # number of training samples per class
 #lr, num_epochs, batch_size = 0.001, 200, 32
-lr, num_epochs, batch_size = 0.00050, 200, 16
+lr, num_epochs, batch_size = 0.00050, 200, 32
 #lr, num_epochs, batch_size = 0.00050, 200, 16
 #lr, num_epochs, batch_size = 0.0005, 200, 12
 #net = network.DBDA_network_drop(BAND, CLASSES_NUM)
