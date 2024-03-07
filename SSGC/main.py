@@ -141,7 +141,7 @@ print("--------" + net.name + " Training Finished-----------")
 
 print("param count: ", params_count(net))
 
-input_shape = (batch_size,1,PATCH_LENGTH,PATCH_LENGTH, img_channels)
+input_shape = (batch_size,1,img_rows,img_cols, img_channels)
 flops, macs, params = calculate_flops(model=net, 
                                       input_shape=input_shape,
                                       output_as_string=True,
