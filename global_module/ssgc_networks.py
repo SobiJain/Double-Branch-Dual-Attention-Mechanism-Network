@@ -88,7 +88,7 @@ class SSGC_network(nn.Module):
                                 kernel_size=(3, 3, 1), stride=(1, 1, 1))
 
         # spatial branch enhancement
-        self.global_pooling21 = nn.AdaptiveAvgPool2d((1,1))
+        self.global_pooling21 = nn.AdaptiveAvgPool2d(output_size=(1, 1))
         self.softmax21 = nn.Softmax()
 
         self.conv25 = nn.Conv2d(25, 25//self.r,
@@ -146,7 +146,7 @@ class SSGC_network(nn.Module):
         #subbranch 1
         x17 = self.conv16(x16)
         print('x17', x17.shape)
-        x17 = x17.reshape(x17.shape[0],1,1,x17.shape[2]*x17.shape[3])
+        x17 = x17.reshape(x17.shape[0],x17.shape[2]*x17.shape[3],1,1)
         x17 = self.softmax11(x17)
         print('x17', x17.shape)
 
@@ -155,14 +155,27 @@ class SSGC_network(nn.Module):
         print('x18', x18.shape)
 
         #multiplying both branches
-        x19 = torch.mul(x17, x18)
+        x17 = x17.reshape(x17.shape[0],1,1, x17.shape[1])
+        x18 = x18.reshape(x18.shape[0],1, x18.shape[2], x18.shape[1])
+        x19 = torch.matmul(x17, x18)
+        print('x19', x19.shape)
+        x19 = x19.reshape(x19.shape[0], x19.shape[3], 1, 1)
+        print('x19', x19.shape)
+
         x19 = self.conv17(x19)
+        print('x19', x19.shape)
+
+        x19 = x19.view(x19.shape[0], x19.shape[1])
         x19 = self.layer_norm11(x19)
+        print('x19', x19.shape)
+
+        x19 = x19.view(x19.shape[0], x19.shape[1],1,1)
         x19 = self.conv18(x19)
+        print('x19', x19.shape)
 
         # adding both initial input and multiplication of the two branches
         x20 = x19 + x16
-
+        print('x20', x20.shape)
 
         # spatial
         #print('x', X.shape)
@@ -179,16 +192,19 @@ class SSGC_network(nn.Module):
         x24 = self.conv24(x24)
 
         x25 = torch.cat((x21, x22, x23, x24), dim=1)
-        #print('x25', x25.shape)
-        
+        print('x25', x25.shape)
+        x25 = x25.squeeze(-1)
+        print('x25', x25.shape)
+
         #subbranch 1
-        x26 = x25.permute(2,0,1)
-        x26 = self.global_pooling21(x26)
-        x26 = x26.permute(1,2,0)
+        x26 = self.global_pooling21(x25)
+        x26 = torch.mean(x26, dim=(2, 3), keepdim=True)
         x26 = self.softmax21(x26)
+        print('x26', x26.shape)
 
         #subbranch 2
-        x27 = x25.reshape(60, x25.shape[0]*x25.shape[1])
+        x27 = x25.reshape(x25.shape[0], x25.shape[1], x25.shape[3]*x25.shape[2])
+        
 
         #mat mul of both branches
         x28 = torch.mul(x26, x27)
