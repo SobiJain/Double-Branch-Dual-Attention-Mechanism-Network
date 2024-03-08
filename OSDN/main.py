@@ -86,7 +86,7 @@ padded_data = np.lib.pad(whole_data, ((PATCH_LENGTH, PATCH_LENGTH), (PATCH_LENGT
 
 for index_iter in range(ITER):
     print('iter:', index_iter)
-    net = osdn.Oneshot_network(BAND, CLASSES_NUM)
+    net = osdn.OSDN(BAND, CLASSES_NUM)
     optimizer = optim.Adam(net.parameters(), lr=lr, amsgrad=False) #, weight_decay=0.0001)
     time_1 = int(time.time())
     np.random.seed(seeds[index_iter])
