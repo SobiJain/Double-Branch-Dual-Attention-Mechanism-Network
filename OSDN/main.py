@@ -13,7 +13,7 @@ from generate_pic import aa_and_each_accuracy, sampling,load_dataset, generate_p
 from Utils import fdssc_model, record, extract_samll_cubic
 from calflops import calculate_flops
 from torchvision import models
-import ssgc_networks
+import osdn
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -86,7 +86,7 @@ padded_data = np.lib.pad(whole_data, ((PATCH_LENGTH, PATCH_LENGTH), (PATCH_LENGT
 
 for index_iter in range(ITER):
     print('iter:', index_iter)
-    net = ssgc_networks.SSGC_network(BAND, CLASSES_NUM)
+    net = osdn.Oneshot_network(BAND, CLASSES_NUM)
     optimizer = optim.Adam(net.parameters(), lr=lr, amsgrad=False) #, weight_decay=0.0001)
     time_1 = int(time.time())
     np.random.seed(seeds[index_iter])
