@@ -105,11 +105,11 @@ class PSA_Spatial(nn.Module):
         return out
 
 
-class Oneshot_network(nn.Module):
+class OSDN(nn.Module):
     def __init__(self, bands, classes):
-        super(Oneshot_network, self).__init__()
+        super(OSDN, self).__init__()
 
-        self.name = 'Oneshot_network'
+        self.name = 'OSDN'
         inter_bands = ((bands - 7) // 2) + 1
         # initial layer
         self.layer0 = nn.Sequential(
