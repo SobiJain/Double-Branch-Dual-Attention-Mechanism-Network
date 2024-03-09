@@ -12,6 +12,7 @@ sys.path.append('../global_module/')
 
 class Channel_PSA(nn.Module):
     def __init__(self, h, w):
+        super(Channel_PSA, self).__init__()
         
         self.name = 'Channel_PSA'
         self.C = 24
@@ -56,6 +57,7 @@ class Channel_PSA(nn.Module):
 
 class Spatial_PSA(nn.Module):
     def __init__(self, h, w):
+        super(Spatial_PSA, self).__init__()
 
         self.name = 'Spatial_PSA'
         self.C = 24
@@ -101,6 +103,7 @@ class Spatial_PSA(nn.Module):
 
 class Channel_PCB(nn.Module):
     def __init__(self, h, w):
+        super(Channel_PCB, self).__init__()
 
         self.name = 'Channel_PCB'
         self.C = 103
@@ -142,6 +145,7 @@ class Channel_PCB(nn.Module):
 
 class Spatial_PCB(nn.Module):
     def __init__(self, h, w):
+        super(Spatial_PCB, self).__init__()
 
         self.name = 'Channel_PCB'
         self.C = 103
@@ -183,6 +187,7 @@ class Spatial_PCB(nn.Module):
 
 class PMCN(nn.Module):
     def __init__(self, bands, classes):
+        super(PMCN, self).__init__()
 
         self.name = 'PMCN'
         self.f = 24
