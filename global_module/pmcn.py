@@ -195,7 +195,7 @@ class PMCN(nn.Module):
         self.w = 9
 
         self.Conv_BN_prelu11 = nn.Sequential(
-            nn.Conv3d(1,f, kernel_size=(1, 1, 1)),
+            nn.Conv3d(1, self.f, kernel_size=(1, 1, 1)),
             nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
