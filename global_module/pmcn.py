@@ -33,14 +33,14 @@ class Channel_PSA(nn.Module):
         batch_size = X.shape[0]
 
         x11 = self.conv11(X)
-        x11 = x11.reshape(batch_size, C//2, h*w)
+        x11 = x11.reshape(batch_size, selC//2, h*w)
         print('x11', x11.shape)
 
         x21 = self.conv21(X)
         x21 = x21.reshape(batch_size, h*w, 1, 1)
         print('x21', x21.shape)
 
-        x21 = sef.softmax21(x21)
+        x21 = self.softmax21(x21)
 
         x31 = torch.einsum("bik,bkjl->bijl", x11, x21)
         print('x31', x31.shape)
@@ -111,9 +111,9 @@ class Channel_PCB(nn.Module):
         self.w = w
         self.f = 24
 
-        self.conv11 = nn.Conv3d(self.f, self.f//2, kernel_size=(7,1,1))
-        self.conv21 = nn.Conv3d(self.f, self.f//2, kernel_size=(5,1,1))
-        self.conv31 = nn.Conv3d(self.f, self.f//2, kernel_size=(3,1,1))
+        self.conv11 = nn.Conv3d(self.f, self.f//2, kernel_size=(7,1,1), padding = (3,0,0))
+        self.conv21 = nn.Conv3d(self.f, self.f//2, kernel_size=(5,1,1), padding = (2,0,0))
+        self.conv31 = nn.Conv3d(self.f, self.f//2, kernel_size=(3,1,1), padding = (1,0,0))
 
         self.BN_prelu = nn.Sequential(
             nn.BatchNorm3d(3*(self.f//2), eps=0.001, momentum=0.1, affine=True),
@@ -133,6 +133,7 @@ class Channel_PCB(nn.Module):
         x11 = self.conv11(X)
         x21 = self.conv21(X)
         x31 = self.conv31(X)
+        print('x11 x21 x31', x11.shape, x21.shape, x31.shape)
 
         x41 = torch.cat((x11, x21, x31), dim = 1)
         print('x41', x41.shape)
@@ -250,6 +251,8 @@ class PMCN(nn.Module):
 
         batch_size = X.shape[0]
 
+        X = X.reshape(batch_size, 1, 103, self.h, self.w)
+
         x11 = self.Conv_BN_prelu11(X)
         print('x11', x11.shape)
 
@@ -318,4 +321,4 @@ class PMCN(nn.Module):
         print('output', output.shape)
 
         return output
-      
+    
