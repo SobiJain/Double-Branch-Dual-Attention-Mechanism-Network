@@ -264,7 +264,7 @@ class PMCN(nn.Module):
 
         x15 = torch.cat((x12, x13, x14), dim = 1)
         x15 = self.Conv_BN_prelu12(x15)
-        print('x15' x15.shape)
+        print('x15', x15.shape)
 
         x16 = self.Conv_BN_prelu13(x15)
         print('x16', x16.shape)
