@@ -200,7 +200,7 @@ class PMCN(nn.Module):
             nn.PReLU()
         )
 
-        self.channel_pcb = Channel_PCB(h,w)
+        self.channel_pcb = Channel_PCB(self.h, self.w)
 
         self.Conv_BN_prelu12 = nn.Sequential(
             nn.Conv3d(3*self.f, self.f, kernel_size=(1, 1, 1)),
@@ -214,7 +214,7 @@ class PMCN(nn.Module):
             nn.PReLU()
         )
 
-        self.channel_psa = Channel_PSA(h,w)
+        self.channel_psa = Channel_PSA(self.h, self.w)
 
         self.Conv_BN_prelu14 = nn.Sequential(
             nn.Conv3d(self.f,103, kernel_size=(1, 1, 1)),
@@ -228,7 +228,7 @@ class PMCN(nn.Module):
             nn.PReLU()
         )
 
-        self.spatial_pcb = Spatial_PCB(h,w)
+        self.spatial_pcb = Spatial_PCB(self.h,self.w)
 
         self.Conv_BN_prelu22 = nn.Sequential(
             nn.Conv3d(3*self.f,60, kernel_size=(1, 1, 1)),
