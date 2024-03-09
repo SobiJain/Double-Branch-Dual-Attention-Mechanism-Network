@@ -48,9 +48,10 @@ class Channel_PSA(nn.Module):
         x32 = self.conv31(x31)
         print('x32', x32.shape)
         x32 = x32.squeeze(-1).squeeze(-1)
-        
+
         x32 = self.layer_norm31(x32)
         x32 = self.sigmoid31(x32)
+        x32 = x32.unsqueeze(-1).unsqueeze(-1)
         print('x32', x32.shape)
 
         output = x32*X
@@ -324,3 +325,4 @@ class PMCN(nn.Module):
         print('output', output.shape)
 
         return output
+    
