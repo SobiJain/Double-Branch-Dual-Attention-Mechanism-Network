@@ -196,47 +196,47 @@ class PMCN(nn.Module):
 
         self.Conv_BN_prelu11 = nn.Sequential(
             nn.Conv3d(1, self.f, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
         self.channel_pcb = Channel_PCB(h,w)
 
         self.Conv_BN_prelu12 = nn.Sequential(
-            nn.Conv3d(3*f,f, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.Conv3d(3*self.f, self.f, kernel_size=(1, 1, 1)),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
         self.Conv_BN_prelu13 = nn.Sequential(
-            nn.Conv3d(f,24, kernel_size=(103, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.Conv3d(self.f,24, kernel_size=(103, 1, 1)),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
         self.channel_psa = Channel_PSA(h,w)
 
         self.Conv_BN_prelu14 = nn.Sequential(
-            nn.Conv3d(f,103, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.Conv3d(self.f,103, kernel_size=(1, 1, 1)),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
         self.Conv_BN_prelu21 = nn.Sequential(
             nn.Conv3d(1,24, kernel_size=(103, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
         self.spatial_pcb = Spatial_PCB(h,w)
 
         self.Conv_BN_prelu22 = nn.Sequential(
-            nn.Conv3d(3*f,60, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.Conv3d(3*self.f,60, kernel_size=(1, 1, 1)),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
-        self.spatial_psa = Spatial_PSA(h,w)
+        self.spatial_psa = Spatial_PSA(self.h,self.w)
 
         self.Avg_BN_mish = nn.Sequential(
             nn.AvgPool2d(kernel_size=(15, 15)),
