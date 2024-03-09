@@ -92,7 +92,7 @@ class Spatial_PSA(nn.Module):
         x31 = torch.einsum("bik,bkj->bij", x21, x11)
         print('x31', x31.shape)
 
-        x32 = x31.reshape(batch_size 1, h, w)
+        x32 = x31.reshape(batch_size, 1, h, w)
         print('x32', x32.shape)
         x32 = self.sigmoid31(x32)
 
