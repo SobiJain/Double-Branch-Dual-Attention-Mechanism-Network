@@ -108,18 +108,18 @@ class Channel_PCB(nn.Module):
         self.w = w
         self.f = 24
 
-        self.conv11 = nn.Conv3d(f, f//2, kernel_size=(7,1,1))
-        self.conv21 = nn.Conv3d(f, f//2, kernel_size=(5,1,1))
-        self.conv31 = nn.Conv3d(f, f//2, kernel_size=(3,1,1))
+        self.conv11 = nn.Conv3d(self.f, self.f//2, kernel_size=(7,1,1))
+        self.conv21 = nn.Conv3d(self.f, self.f//2, kernel_size=(5,1,1))
+        self.conv31 = nn.Conv3d(self.f, self.f//2, kernel_size=(3,1,1))
 
         self.BN_prelu = nn.Sequential(
-            nn.BatchNorm3d(3*(f//2), eps=0.001, momentum=0.1, affine=True),
+            nn.BatchNorm3d(3*(self.f//2), eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
         self.Conv_BN_prelu = nn.Sequential(
-            nn.Conv3d(3*(f//2),f, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.Conv3d(3*(self.f//2), self.f, kernel_size=(1, 1, 1)),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
@@ -149,18 +149,18 @@ class Spatial_PCB(nn.Module):
         self.w = w
         self.f = 24
 
-        self.conv11 = nn.Conv3d(f, f//2, kernel_size=(1,7,7))
-        self.conv21 = nn.Conv3d(f, f//2, kernel_size=(1,5,5))
-        self.conv31 = nn.Conv3d(f, f//2, kernel_size=(1,3,3))
+        self.conv11 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,7,7))
+        self.conv21 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,5,5))
+        self.conv31 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,3,3))
 
         self.BN_prelu = nn.Sequential(
-            nn.BatchNorm3d(3*(f//2), eps=0.001, momentum=0.1, affine=True),
+            nn.BatchNorm3d(3*(self.f//2), eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
         self.Conv_BN_prelu = nn.Sequential(
-            nn.Conv3d(3*(f//2),f, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(f, eps=0.001, momentum=0.1, affine=True),
+            nn.Conv3d(3*(self.f//2), self.f, kernel_size=(1, 1, 1)),
+            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
