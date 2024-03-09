@@ -183,7 +183,6 @@ class Spatial_PCB(nn.Module):
 
 class PMCN(nn.Module):
     def __init__(self, bands, classes):
-        super(PMCN, self).__init__()
 
         self.name = 'PMCN'
         self.f = 24
