@@ -246,7 +246,7 @@ class PMCN(nn.Module):
 
         self.linear = nn.Linear(60, classes)
 
-    def forward(self, X)
+    def forward(self, X):
 
         batch_size = X.shape[0]
 
