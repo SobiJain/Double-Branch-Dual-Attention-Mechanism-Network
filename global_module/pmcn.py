@@ -33,11 +33,11 @@ class Channel_PSA(nn.Module):
         batch_size = X.shape[0]
 
         x11 = self.conv11(X)
-        x11 = x11.reshape(batch_size, selC//2, h*w)
+        x11 = x11.reshape(batch_size, self.C//2, self.h*self.w)
         print('x11', x11.shape)
 
         x21 = self.conv21(X)
-        x21 = x21.reshape(batch_size, h*w, 1, 1)
+        x21 = x21.reshape(batch_size, self.h*self.w, 1, 1)
         print('x21', x21.shape)
 
         x21 = self.softmax21(x21)
@@ -47,8 +47,11 @@ class Channel_PSA(nn.Module):
 
         x32 = self.conv31(x31)
         print('x32', x32.shape)
+        x32 = x32.squeeze(-1).squeeze(-1)
+        
         x32 = self.layer_norm31(x32)
         x32 = self.sigmoid31(x32)
+        print('x32', x32.shape)
 
         output = x32*X
         print('output', output.shape)
@@ -77,22 +80,22 @@ class Spatial_PSA(nn.Module):
         batch_size = X.shape[0]
 
         x11 = self.conv11(X)
-        x11 = x11.reshape(batch_size, C//2, h*w)
+        x11 = x11.reshape(batch_size, self.C//2, self.h*self.w)
         print('x11', x11.shape)
 
         x21 = self.conv21(X)
         print('x21', x21.shape)
         x21 = self.global_pooling21(x21)
         print('x21', x21.shape)
-        x21 = x21.reshape(batch_size, 1, C//2)
+        x21 = x21.reshape(batch_size, 1, self.C//2)
         print('x21', x21.shape)
 
-        x21 = sef.softmax21(x21)
+        x21 = self.softmax21(x21)
 
         x31 = torch.einsum("bik,bkj->bij", x21, x11)
         print('x31', x31.shape)
 
-        x32 = x31.reshape(batch_size, 1, h, w)
+        x32 = x31.reshape(batch_size, 1, self.h, self.w)
         print('x32', x32.shape)
         x32 = self.sigmoid31(x32)
 
@@ -321,4 +324,3 @@ class PMCN(nn.Module):
         print('output', output.shape)
 
         return output
-    
