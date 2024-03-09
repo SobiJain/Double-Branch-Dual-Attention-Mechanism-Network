@@ -19,13 +19,13 @@ class Channel_PSA(nn.Module):
         self.h = h
         self.w = w
 
-        self.conv11 =  nn.Conv2d(C, C//2, kernel_size=(1,1))
-        self.conv21 =  nn.Conv2d(C, 1, kernel_size=(1,1))
+        self.conv11 =  nn.Conv2d(self.C, self.C//2, kernel_size=(1,1))
+        self.conv21 =  nn.Conv2d(self.C, 1, kernel_size=(1,1))
 
         self.softmax21 = nn.Softmax()
 
-        self.conv31 = nn.Conv2d(C//2, C, kernel_size=(1,1))
-        self.layer_norm31 = nn.LayerNorm(C)
+        self.conv31 = nn.Conv2d(self.C//2, self.C, kernel_size=(1,1))
+        self.layer_norm31 = nn.LayerNorm(self.C)
         self.sigmoid31 = nn.Sigmoid()
 
     def forward(self,X):
@@ -64,8 +64,8 @@ class Spatial_PSA(nn.Module):
         self.h = h
         self.w = w
 
-        self.conv11 =  nn.Conv2d(C, C//2, kernel_size=(1,1))
-        self.conv21 =  nn.Conv2d(C, C//2, kernel_size=(1,1))
+        self.conv11 =  nn.Conv2d(self.C, self.C//2, kernel_size=(1,1))
+        self.conv21 =  nn.Conv2d(self.C, self.C//2, kernel_size=(1,1))
 
         self.global_pooling21 = nn.AvgPool2d(kernel_size=(h, w))
 
