@@ -270,7 +270,7 @@ class PMCN(nn.Module):
         x14 = self.channel_pcb(x13)
         # print('x14', x14.shape)
 
-        x15 = torch.cat((x12, x13, x14), dim = 1)
+        x15 = torch.cat((x14, x13, x12), dim = 1)
         x15 = self.Conv_BN_prelu12(x15)
         # print('x15', x15.shape)
 
@@ -304,7 +304,7 @@ class PMCN(nn.Module):
         x22 = self.spatial_pcb(x21)
         # print('x22', x22.shape)
 
-        x23 = torch.cat((x20, x21, x22), dim = 1)
+        x23 = torch.cat((x22, x21, x20), dim = 1)
         # print('x23', x23.shape)
 
         x24 = self.Conv_BN_prelu22(x23)
