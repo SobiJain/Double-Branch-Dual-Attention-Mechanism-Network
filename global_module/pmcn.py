@@ -34,28 +34,28 @@ class Channel_PSA(nn.Module):
 
         x11 = self.conv11(X)
         x11 = x11.reshape(batch_size, self.C//2, self.h*self.w)
-        print('x11', x11.shape)
+        # print('x11', x11.shape)
 
         x21 = self.conv21(X)
         x21 = x21.reshape(batch_size, self.h*self.w, 1, 1)
-        print('x21', x21.shape)
+        # print('x21', x21.shape)
 
         x21 = self.softmax21(x21)
 
         x31 = torch.einsum("bik,bkjl->bijl", x11, x21)
-        print('x31', x31.shape)
+        # print('x31', x31.shape)
 
         x32 = self.conv31(x31)
-        print('x32', x32.shape)
+        # print('x32', x32.shape)
         x32 = x32.squeeze(-1).squeeze(-1)
 
         x32 = self.layer_norm31(x32)
         x32 = self.sigmoid31(x32)
         x32 = x32.unsqueeze(-1).unsqueeze(-1)
-        print('x32', x32.shape)
+        # print('x32', x32.shape)
 
         output = x32*X
-        print('output', output.shape)
+        # print('output', output.shape)
 
         return output
 
@@ -64,7 +64,7 @@ class Spatial_PSA(nn.Module):
         super(Spatial_PSA, self).__init__()
 
         self.name = 'Spatial_PSA'
-        self.C = 24
+        self.C = 60
         self.h = h
         self.w = w
 
@@ -82,26 +82,26 @@ class Spatial_PSA(nn.Module):
 
         x11 = self.conv11(X)
         x11 = x11.reshape(batch_size, self.C//2, self.h*self.w)
-        print('x11', x11.shape)
+        # print('x11', x11.shape)
 
         x21 = self.conv21(X)
-        print('x21', x21.shape)
+        # print('x21', x21.shape)
         x21 = self.global_pooling21(x21)
-        print('x21', x21.shape)
+        # print('x21', x21.shape)
         x21 = x21.reshape(batch_size, 1, self.C//2)
-        print('x21', x21.shape)
+        # print('x21', x21.shape)
 
         x21 = self.softmax21(x21)
 
         x31 = torch.einsum("bik,bkj->bij", x21, x11)
-        print('x31', x31.shape)
+        # print('x31', x31.shape)
 
         x32 = x31.reshape(batch_size, 1, self.h, self.w)
-        print('x32', x32.shape)
+        # print('x32', x32.shape)
         x32 = self.sigmoid31(x32)
 
         output = x32*X
-        print('output', output.shape)
+        # print('output', output.shape)
 
         return output
 
@@ -137,14 +137,14 @@ class Channel_PCB(nn.Module):
         x11 = self.conv11(X)
         x21 = self.conv21(X)
         x31 = self.conv31(X)
-        print('x11 x21 x31', x11.shape, x21.shape, x31.shape)
+        # print('x11 x21 x31', x11.shape, x21.shape, x31.shape)
 
         x41 = torch.cat((x11, x21, x31), dim = 1)
-        print('x41', x41.shape)
+        # print('x41', x41.shape)
 
         x42 = self.BN_prelu(x41)
         x43 = self.Conv_BN_prelu(x42)
-        print('x43', x43.shape)
+        # print('x43', x43.shape)
 
         return x43
 
@@ -158,9 +158,9 @@ class Spatial_PCB(nn.Module):
         self.w = w
         self.f = 24
 
-        self.conv11 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,7,7))
-        self.conv21 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,5,5))
-        self.conv31 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,3,3))
+        self.conv11 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,7,7), padding=(0,3,3))
+        self.conv21 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,5,5), padding=(0,2,2))
+        self.conv31 = nn.Conv3d(self.f, self.f//2, kernel_size=(1,3,3), padding=(0,1,1))
 
         self.BN_prelu = nn.Sequential(
             nn.BatchNorm3d(3*(self.f//2), eps=0.001, momentum=0.1, affine=True),
@@ -180,13 +180,14 @@ class Spatial_PCB(nn.Module):
         x11 = self.conv11(X)
         x21 = self.conv21(X)
         x31 = self.conv31(X)
+        # print('x11 x21 x31', x11.shape, x21.shape, x31.shape)
 
         x41 = torch.cat((x11, x21, x31), dim = 1)
-        print('x41', x41.shape)
+        # print('x41', x41.shape)
 
         x42 = self.BN_prelu(x41)
         x43 = self.Conv_BN_prelu(x42)
-        print('x43', x43.shape)
+        # print('x43', x43.shape)
 
         return x43
 
@@ -223,7 +224,7 @@ class PMCN(nn.Module):
 
         self.Conv_BN_prelu14 = nn.Sequential(
             nn.Conv3d(self.f,103, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
+            nn.BatchNorm3d(103, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
@@ -237,19 +238,19 @@ class PMCN(nn.Module):
 
         self.Conv_BN_prelu22 = nn.Sequential(
             nn.Conv3d(3*self.f,60, kernel_size=(1, 1, 1)),
-            nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
+            nn.BatchNorm3d(60, eps=0.001, momentum=0.1, affine=True),
             nn.PReLU()
         )
 
-        self.spatial_psa = Spatial_PSA(self.h,self.w)
+        self.spatial_psa = Spatial_PSA(self.h, self.w)
 
         self.Avg_BN_mish = nn.Sequential(
-            nn.AvgPool2d(kernel_size=(15, 15)),
+            nn.AvgPool2d(kernel_size=(self.h, self.w)),
             nn.BatchNorm2d(60),
             mish()
         )
 
-        self.linear = nn.Linear(60, classes)
+        self.linear = nn.Linear(in_features=60, out_features=classes)
 
     def forward(self, X):
 
@@ -258,71 +259,71 @@ class PMCN(nn.Module):
         X = X.reshape(batch_size, 1, 103, self.h, self.w)
 
         x11 = self.Conv_BN_prelu11(X)
-        print('x11', x11.shape)
+        # print('x11', x11.shape)
 
         x12 = self.channel_pcb(x11)
-        print('x12', x12.shape)
+        # print('x12', x12.shape)
 
         x13 = self.channel_pcb(x12)
-        print('x13', x13.shape)
+        # print('x13', x13.shape)
 
         x14 = self.channel_pcb(x13)
-        print('x14', x14.shape)
+        # print('x14', x14.shape)
 
         x15 = torch.cat((x12, x13, x14), dim = 1)
         x15 = self.Conv_BN_prelu12(x15)
-        print('x15', x15.shape)
+        # print('x15', x15.shape)
 
         x16 = self.Conv_BN_prelu13(x15)
-        print('x16', x16.shape)
+        # print('x16', x16.shape)
 
         x16 = x16.reshape(batch_size, self.f, self.h, self.w)
-        print('x16', x16.shape)
+        # print('x16', x16.shape)
 
         x17 = self.channel_psa(x16)
-        print('x17', x17.shape)
+        # print('x17', x17.shape)
 
         x17 = x16.reshape(batch_size, self.f, 1, self.h, self.w)
-        print('x17', x17.shape)
+        # print('x17', x17.shape)
 
         x18 = self.Conv_BN_prelu14(x17)
-        print('x18', x18.shape)
+        # print('x18', x18.shape)
 
         x18 = x18.reshape(batch_size, x18.shape[2], x18.shape[1], self.h, self.w)
-        print('x18', x18.shape)
+        # print('x18', x18.shape)
 
         x19 = self.Conv_BN_prelu21(x18)
-        print('x19', x19.shape)
+        # print('x19', x19.shape)
 
         x20 = self.spatial_pcb(x19)
-        print('x20', x20.shape)
+        # print('x20', x20.shape)
 
         x21 = self.spatial_pcb(x20)
-        print('x20', x21.shape)
+        # print('x21', x21.shape)
 
         x22 = self.spatial_pcb(x21)
-        print('x20', x22.shape)
+        # print('x22', x22.shape)
 
         x23 = torch.cat((x20, x21, x22), dim = 1)
-        print('x23', x23.shape)
+        # print('x23', x23.shape)
 
         x24 = self.Conv_BN_prelu22(x23)
-        print('x24', x24.shape)
+        # print('x24', x24.shape)
 
         x24 = x24.reshape(batch_size, 60, self.h, self.w)
-        print('x24', x24.shape)
+        # print('x24', x24.shape)
 
         x25 = self.spatial_psa(x24)
-        print('x25', x25.shape)
+        # print('x25', x25.shape)
 
         x25 = self.Avg_BN_mish(x25)
-        print('x25', x25.shape)
+        # print('x25', x25.shape)
 
-        x25 = x25.squeeze(-1)
-        print('x25', x25.shape)
+        x25 = x25.squeeze(-1).squeeze(-1)
+        # print('x25', x25.shape)
 
-        output = self.linear()
-        print('output', output.shape)
+        output = self.linear(x25)
+        # print('output', output.shape)
 
         return output
     
