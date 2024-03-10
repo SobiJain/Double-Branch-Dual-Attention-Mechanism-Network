@@ -15,7 +15,7 @@ def load_dataset(Dataset):
         data_hsi = mat_data['indian_pines_corrected']
         gt_hsi = mat_gt['indian_pines_gt']
         TOTAL_SIZE = 10249
-        VALIDATION_SPLIT = 0.97
+        VALIDATION_SPLIT = 0.99
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'UP':
