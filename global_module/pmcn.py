@@ -197,8 +197,8 @@ class PMCN(nn.Module):
 
         self.name = 'PMCN'
         self.f = 24
-        self.h = 9
-        self.w = 9
+        self.h = 11
+        self.w = 11
 
         self.Conv_BN_prelu11 = nn.Sequential(
             nn.Conv3d(1, self.f, kernel_size=(1, 1, 1)),
@@ -272,6 +272,7 @@ class PMCN(nn.Module):
 
         x15 = torch.cat((x14, x13, x12), dim = 1)
         x15 = self.Conv_BN_prelu12(x15)
+        x15 = x15 + x11
         # print('x15', x15.shape)
 
         x16 = self.Conv_BN_prelu13(x15)
@@ -292,10 +293,10 @@ class PMCN(nn.Module):
         x18 = x18.reshape(batch_size, x18.shape[2], x18.shape[1], self.h, self.w)
         # print('x18', x18.shape)
 
-        x19 = self.Conv_BN_prelu21(x18)
-        # print('x19', x19.shape)
+        x111 = self.Conv_BN_prelu21(x18)
+        # print('x111', x111.shape)
 
-        x20 = self.spatial_pcb(x19)
+        x20 = self.spatial_pcb(x111)
         # print('x20', x20.shape)
 
         x21 = self.spatial_pcb(x20)
@@ -326,4 +327,3 @@ class PMCN(nn.Module):
         # print('output', output.shape)
 
         return output
-    
