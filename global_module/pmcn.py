@@ -292,6 +292,7 @@ class PMCN(nn.Module):
 
         x18 = x18.reshape(batch_size, x18.shape[2], x18.shape[1], self.h, self.w)
         # print('x18', x18.shape)
+        x18 = x18 + X
 
         x111 = self.Conv_BN_prelu21(x18)
         # print('x111', x111.shape)
