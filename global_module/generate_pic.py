@@ -4,7 +4,7 @@ from operator import truediv
 import scipy.io as sio
 import torch
 import math
-from Utils import extract_samll_cubic
+from Utils import extract_samll_cubic_save_RAM
 import torch.utils.data as Data
 import mat73
 
@@ -215,7 +215,7 @@ def list_to_colormap(x_list):
 
 
 def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE, total_indices, VAL_SIZE,
-                  whole_data, PATCH_LENGTH, padded_data, INPUT_DIMENSION, batch_size, gt):
+                  whole_data, PATCH_LENGTH, padded_data, INPUT_DIMENSION, batch_size, gt, device):
 
     gt_all = gt[total_indices] - 1
     y_train = gt[train_indices] - 1
@@ -223,12 +223,12 @@ def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE
 
 
 
-    all_data = extract_samll_cubic.select_small_cubic(TOTAL_SIZE, total_indices, whole_data,
+    all_data = extract_samll_cubic_save_RAM.select_small_cubic(TOTAL_SIZE, total_indices, whole_data,
                                                       PATCH_LENGTH, padded_data, INPUT_DIMENSION)
 
-    train_data = extract_samll_cubic.select_small_cubic(TRAIN_SIZE, train_indices, whole_data,
+    train_data = extract_samll_cubic_save_RAM.select_small_cubic(TRAIN_SIZE, train_indices, whole_data,
                                                         PATCH_LENGTH, padded_data, INPUT_DIMENSION)
-    test_data = extract_samll_cubic.select_small_cubic(TEST_SIZE, test_indices, whole_data,
+    test_data = extract_samll_cubic_save_RAM.select_small_cubic(TEST_SIZE, test_indices, whole_data,
                                                        PATCH_LENGTH, padded_data, INPUT_DIMENSION)
     x_train = train_data.reshape(train_data.shape[0], train_data.shape[1], train_data.shape[2], INPUT_DIMENSION)
     x_test_all = test_data.reshape(test_data.shape[0], test_data.shape[1], test_data.shape[2], INPUT_DIMENSION)
@@ -248,21 +248,21 @@ def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE
 
     # print(y1_train)
     #y1_train = to_categorical(y1_train)  # to one-hot labels
-    x1_tensor_train = torch.from_numpy(x_train).type(torch.FloatTensor).unsqueeze(1)
-    y1_tensor_train = torch.from_numpy(y_train).type(torch.FloatTensor)
+    x1_tensor_train = torch.from_numpy(x_train).type(torch.FloatTensor).unsqueeze(1).to(device)
+    y1_tensor_train = torch.from_numpy(y_train).type(torch.FloatTensor).to(device)
     torch_dataset_train = Data.TensorDataset(x1_tensor_train, y1_tensor_train)
 
-    x1_tensor_valida = torch.from_numpy(x_val).type(torch.FloatTensor).unsqueeze(1)
-    y1_tensor_valida = torch.from_numpy(y_val).type(torch.FloatTensor)
+    x1_tensor_valida = torch.from_numpy(x_val).type(torch.FloatTensor).unsqueeze(1).to(device)
+    y1_tensor_valida = torch.from_numpy(y_val).type(torch.FloatTensor).to(device)
     torch_dataset_valida = Data.TensorDataset(x1_tensor_valida, y1_tensor_valida)
 
-    x1_tensor_test = torch.from_numpy(x_test).type(torch.FloatTensor).unsqueeze(1)
-    y1_tensor_test = torch.from_numpy(y_test).type(torch.FloatTensor)
+    x1_tensor_test = torch.from_numpy(x_test).type(torch.FloatTensor).unsqueeze(1).to(device)
+    y1_tensor_test = torch.from_numpy(y_test).type(torch.FloatTensor).to(device)
     torch_dataset_test = Data.TensorDataset(x1_tensor_test,y1_tensor_test)
 
     all_data.reshape(all_data.shape[0], all_data.shape[1], all_data.shape[2], INPUT_DIMENSION)
-    all_tensor_data = torch.from_numpy(all_data).type(torch.FloatTensor).unsqueeze(1)
-    all_tensor_data_label = torch.from_numpy(gt_all).type(torch.FloatTensor)
+    all_tensor_data = torch.from_numpy(all_data).type(torch.FloatTensor).unsqueeze(1).to(device)
+    all_tensor_data_label = torch.from_numpy(gt_all).type(torch.FloatTensor).to(device)
     torch_dataset_all = Data.TensorDataset(all_tensor_data, all_tensor_data_label)
 
 
@@ -271,24 +271,28 @@ def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE
         batch_size=batch_size,  # mini batch size
         shuffle=True,  # 要不要打乱数据 (打乱比较好)
         num_workers=0,  # 多线程来读数据
+        pin_memory=True,
     )
     valiada_iter = Data.DataLoader(
         dataset=torch_dataset_valida,  # torch TensorDataset format
         batch_size=batch_size,  # mini batch size
         shuffle=True,  # 要不要打乱数据 (打乱比较好)
         num_workers=0,  # 多线程来读数据
+        pin_memory=True,
     )
     test_iter = Data.DataLoader(
         dataset=torch_dataset_test,  # torch TensorDataset format
         batch_size=batch_size,  # mini batch size
         shuffle=False,  # 要不要打乱数据 (打乱比较好)
         num_workers=0,  # 多线程来读数据
+        pin_memory=True,
     )
     all_iter = Data.DataLoader(
         dataset=torch_dataset_all,  # torch TensorDataset format
         batch_size=batch_size,  # mini batch size
         shuffle=False,  # 要不要打乱数据 (打乱比较好)
         num_workers=0,  # 多线程来读数据
+        pin_memory=True,
     )
     return train_iter, valiada_iter, test_iter, all_iter #, y_test
 
