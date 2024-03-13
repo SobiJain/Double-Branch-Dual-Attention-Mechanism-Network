@@ -33,6 +33,15 @@ def load_dataset(Dataset):
         data_hsi = uHouston['ori_data']
         gt_hsi = gt_uHouston['map']
         TOTAL_SIZE = 2530
+        VALIDATION_SPLIT = 0.90
+        TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
+
+    if Dataset == 'HU18':
+        uHouston = mat73.loadmat('../datasets/Houston18.mat')
+        gt_uHouston = mat73.loadmat('../datasets/Houston18_7gt.mat')
+        data_hsi = uHouston['ori_data']
+        gt_hsi = gt_uHouston['map']
+        TOTAL_SIZE = 53200
         VALIDATION_SPLIT = 0.99
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
