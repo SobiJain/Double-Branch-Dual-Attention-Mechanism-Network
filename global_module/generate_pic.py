@@ -6,7 +6,7 @@ import torch
 import math
 from Utils import extract_samll_cubic
 import torch.utils.data as Data
-
+import mat73
 
 def load_dataset(Dataset):
     if Dataset == 'IN':
@@ -27,13 +27,13 @@ def load_dataset(Dataset):
         VALIDATION_SPLIT = 0.990
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
-    if Dataset == 'PC':
-        uPavia = sio.loadmat('../datasets/Pavia.mat')
-        gt_uPavia = sio.loadmat('../datasets/Pavia_gt.mat')
-        data_hsi = uPavia['pavia']
-        gt_hsi = gt_uPavia['pavia_gt']
-        TOTAL_SIZE = 148152
-        VALIDATION_SPLIT = 0.999
+    if Dataset == 'HU13':
+        uHouston = mat73.loadmat('../datasets/Houston13.mat')
+        gt_uHouston = mat73.loadmat('../datasets/Houston13_7gt.mat')
+        data_hsi = uHouston['ori_data']
+        gt_hsi = gt_uHouston['map']
+        TOTAL_SIZE = 2530
+        VALIDATION_SPLIT = 0.99
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'SV':
@@ -42,7 +42,7 @@ def load_dataset(Dataset):
         data_hsi = SV['salinas_corrected']
         gt_hsi = gt_SV['salinas_gt']
         TOTAL_SIZE = 54129
-        VALIDATION_SPLIT = 0.995
+        VALIDATION_SPLIT = 0.99
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'KSC':
@@ -51,7 +51,7 @@ def load_dataset(Dataset):
         data_hsi = KSC['KSC']
         gt_hsi = gt_KSC['KSC_gt']
         TOTAL_SIZE = 5211
-        VALIDATION_SPLIT = 0.95
+        VALIDATION_SPLIT = 0.90
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'BS':
@@ -84,7 +84,7 @@ def sampling(proportion, ground_truth):
     train = {}
     test = {}
     labels_loc = {}
-    m = max(ground_truth)
+    m = int(max(ground_truth))
     for i in range(m):
         indexes = [j for j, x in enumerate(ground_truth.ravel().tolist()) if x == i + 1]
         np.random.shuffle(indexes)
@@ -105,6 +105,7 @@ def sampling(proportion, ground_truth):
         test_indexes += test[i]
     np.random.shuffle(train_indexes)
     np.random.shuffle(test_indexes)
+    print("len", len(train_indexes), len(test_indexes))
     return train_indexes, test_indexes
 
 def aa_and_each_accuracy(confusion_matrix):
@@ -184,6 +185,8 @@ def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE
     y_train = gt[train_indices] - 1
     y_test = gt[test_indices] - 1
 
+
+
     all_data = extract_samll_cubic.select_small_cubic(TOTAL_SIZE, total_indices, whole_data,
                                                       PATCH_LENGTH, padded_data, INPUT_DIMENSION)
 
@@ -193,7 +196,7 @@ def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE
                                                        PATCH_LENGTH, padded_data, INPUT_DIMENSION)
     x_train = train_data.reshape(train_data.shape[0], train_data.shape[1], train_data.shape[2], INPUT_DIMENSION)
     x_test_all = test_data.reshape(test_data.shape[0], test_data.shape[1], test_data.shape[2], INPUT_DIMENSION)
-
+    
     x_val = x_test_all[-VAL_SIZE:]
     y_val = y_test[-VAL_SIZE:]
 
