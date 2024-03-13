@@ -45,11 +45,11 @@ print(data_hsi.shape)
 image_x, image_y, BAND = data_hsi.shape
 data = data_hsi.reshape(np.prod(data_hsi.shape[:2]), np.prod(data_hsi.shape[2:]))
 gt = gt_hsi.reshape(np.prod(gt_hsi.shape[:2]),)
-CLASSES_NUM = max(gt)
+CLASSES_NUM = int(max(gt))
 print('The class numbers of the HSI data is:', CLASSES_NUM)
 
 print('-----Importing Setting Parameters-----')
-ITER = 1
+ITER = 3
 PATCH_LENGTH = 5
 # number of training samples per class
 #lr, num_epochs, batch_size = 0.001, 200, 32
