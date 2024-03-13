@@ -42,6 +42,33 @@ def load_dataset(Dataset):
         data_hsi = uHouston['ori_data']
         gt_hsi = gt_uHouston['map']
         TOTAL_SIZE = 53200
+        VALIDATION_SPLIT = 0.90
+        TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
+
+    if Dataset == 'WHU_HC':
+        uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-HanChuan/WHU_Hi_HanChuan.mat')
+        gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-HanChuan/WHU_Hi_HanChuan_gt.mat')
+        data_hsi = uHouston['WHU_Hi_HanChuan']
+        gt_hsi = gt_uHouston['WHU_Hi_HanChuan_gt']
+        TOTAL_SIZE = 257530
+        VALIDATION_SPLIT = 0.99
+        TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
+
+    if Dataset == 'WHU_HH':
+        uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-HongHu/WHU_Hi_HongHu.mat')
+        gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-HongHu/WHU_Hi_HongHu_gt.mat')
+        data_hsi = uHouston['WHU_Hi_HongHu']
+        gt_hsi = gt_uHouston['WHU_Hi_HongHu_gt']
+        TOTAL_SIZE = 386693
+        VALIDATION_SPLIT = 0.99
+        TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
+
+    if Dataset == 'WHU_LK':
+        uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-LongKou/WHU_Hi_LongKou.mat')
+        gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-LongKou/WHU_Hi_LongKou_gt.mat')
+        data_hsi = uHouston['WHU_Hi_LongKou']
+        gt_hsi = gt_uHouston['WHU_Hi_LongKou_gt']
+        TOTAL_SIZE = 204542
         VALIDATION_SPLIT = 0.99
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
