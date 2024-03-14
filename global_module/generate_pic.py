@@ -59,7 +59,7 @@ def load_dataset(Dataset):
         gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data/WHU data/WHU-Hi-HongHu/WHU_Hi_HongHu_gt.mat')
         data_hsi = uHouston['WHU_Hi_HongHu']
         gt_hsi = gt_uHouston['WHU_Hi_HongHu_gt']
-        TOTAL_SIZE = 386693
+        TOTAL_SIZE = 68879
         VALIDATION_SPLIT = 0.99
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
