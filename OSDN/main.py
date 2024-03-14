@@ -45,6 +45,14 @@ if(Dataset == 'WHU_HH'):
   data_hsi = data_hsi[700:941, :330, :]
   gt_hsi = gt_hsi[700:941, :330]
 
+if(Dataset == 'WHU_HC'):
+  data_hsi = data_hsi[380:870, 43:253, :]
+  gt_hsi = gt_hsi[380:870, 43:253]
+
+if(Dataset == 'WHU_LK'):
+  data_hsi = data_hsi[200:, 40:-60, :]
+  gt_hsi = gt_hsi[200:, 40:-60]
+
 print(data_hsi.shape)
 image_x, image_y, BAND = data_hsi.shape
 data = data_hsi.reshape(np.prod(data_hsi.shape[:2]), np.prod(data_hsi.shape[2:]))
@@ -54,7 +62,7 @@ CLASSES_NUM = int(max(gt))
 print('The class numbers of the HSI data is:', CLASSES_NUM)
 
 print('-----Importing Setting Parameters-----')
-ITER = 3
+ITER = 2
 PATCH_LENGTH = 5
 # number of training samples per class
 #lr, num_epochs, batch_size = 0.001, 200, 32
@@ -81,7 +89,7 @@ OA = []
 AA = []
 TRAINING_TIME = []
 TESTING_TIME = []
-ELEMENT_ACC = np.zeros((ITER, 16))
+ELEMENT_ACC = np.zeros((ITER, 14))
 
 data = preprocessing.scale(data)
 data_ = data.reshape(data_hsi.shape[0], data_hsi.shape[1], data_hsi.shape[2])
