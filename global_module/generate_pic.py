@@ -51,7 +51,7 @@ def load_dataset(Dataset):
         data_hsi = uHouston['WHU_Hi_HanChuan']
         gt_hsi = gt_uHouston['WHU_Hi_HanChuan_gt']
         TOTAL_SIZE = 72202
-        VALIDATION_SPLIT = 0.98
+        VALIDATION_SPLIT = 0.90
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'WHU_HH':
@@ -68,7 +68,7 @@ def load_dataset(Dataset):
         gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data/WHU data/WHU-Hi-LongKou/WHU_Hi_LongKou_gt.mat')
         data_hsi = uHouston['WHU_Hi_LongKou']
         gt_hsi = gt_uHouston['WHU_Hi_LongKou_gt']
-        TOTAL_SIZE = 204542
+        TOTAL_SIZE = 68921
         VALIDATION_SPLIT = 0.99
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
