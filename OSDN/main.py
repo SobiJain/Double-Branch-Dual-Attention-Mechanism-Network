@@ -41,6 +41,10 @@ dataset = input('Please input the name of Dataset(IN, UP, BS, SV, PC or KSC):')
 Dataset = dataset.upper()
 data_hsi, gt_hsi, TOTAL_SIZE, TRAIN_SIZE,VALIDATION_SPLIT = load_dataset(Dataset)
 
+if(Dataset == 'WHU_HH'):
+  data_hsi = data_hsi[700:941, :330, :]
+  gt_hsi = gt_hsi[700:941, :330]
+
 print(data_hsi.shape)
 image_x, image_y, BAND = data_hsi.shape
 data = data_hsi.reshape(np.prod(data_hsi.shape[:2]), np.prod(data_hsi.shape[2:]))
