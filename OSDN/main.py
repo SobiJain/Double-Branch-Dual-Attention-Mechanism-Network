@@ -50,8 +50,8 @@ if(Dataset == 'WHU_HC'):
   gt_hsi = gt_hsi[380:870, 43:253]
 
 if(Dataset == 'WHU_LK'):
-  data_hsi = data_hsi[200:, 40:-60, :]
-  gt_hsi = gt_hsi[200:, 40:-60]
+  data_hsi = data_hsi[200:-100, 40:-60, :]
+  gt_hsi = gt_hsi[200:-100, 40:-60]
 
 print(data_hsi.shape)
 image_x, image_y, BAND = data_hsi.shape
