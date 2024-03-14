@@ -8,12 +8,12 @@ import datetime
 
 import sys
 sys.path.append('../global_module/')
-import network
 import train
 from generate_pic import aa_and_each_accuracy, sampling,load_dataset, generate_png, generate_iter
 from Utils import fdssc_model, record, extract_samll_cubic
 from calflops import calculate_flops
 from torchvision import models
+import network
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -41,16 +41,21 @@ dataset = input('Please input the name of Dataset(IN, UP, BS, SV, PC or KSC):')
 Dataset = dataset.upper()
 data_hsi, gt_hsi, TOTAL_SIZE, TRAIN_SIZE,VALIDATION_SPLIT = load_dataset(Dataset)
 
+if(Dataset == 'WHU_HH'):
+  data_hsi = data_hsi[700:941, :330, :]
+  gt_hsi = gt_hsi[700:941, :330]
+
 print(data_hsi.shape)
 image_x, image_y, BAND = data_hsi.shape
 data = data_hsi.reshape(np.prod(data_hsi.shape[:2]), np.prod(data_hsi.shape[2:]))
 gt = gt_hsi.reshape(np.prod(gt_hsi.shape[:2]),)
-CLASSES_NUM = max(gt)
+CLASSES_NUM = int(max(gt))
+
 print('The class numbers of the HSI data is:', CLASSES_NUM)
 
 print('-----Importing Setting Parameters-----')
-ITER = 1
-PATCH_LENGTH = 4
+ITER = 2
+PATCH_LENGTH = 5
 # number of training samples per class
 #lr, num_epochs, batch_size = 0.001, 200, 32
 lr, num_epochs, batch_size = 0.00050, 200, 32
@@ -135,13 +140,14 @@ for index_iter in range(ITER):
     TRAINING_TIME.append(diff)
     diff = toc2 - tic2
     TESTING_TIME.append(diff)
+    print(each_acc_fdssc)
     ELEMENT_ACC[index_iter, :] = each_acc_fdssc
 
 print("--------" + net.name + " Training Finished-----------")
 
 print("param count: ", params_count(net))
 
-input_shape = (batch_size,1,PATCH_LENGTH,PATCH_LENGTH, img_channels)
+input_shape = (batch_size,1,img_rows,img_cols, img_channels)
 flops, macs, params = calculate_flops(model=net, 
                                       input_shape=input_shape,
                                       output_as_string=True,
