@@ -55,8 +55,8 @@ def load_dataset(Dataset):
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'WHU_HH':
-        uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-HongHu/WHU_Hi_HongHu.mat')
-        gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-HongHu/WHU_Hi_HongHu_gt.mat')
+        uHouston = sio.loadmat('/content/drive/MyDrive/Data/WHU data/WHU-Hi-HongHu/WHU_Hi_HongHu.mat')
+        gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data/WHU data/WHU-Hi-HongHu/WHU_Hi_HongHu_gt.mat')
         data_hsi = uHouston['WHU_Hi_HongHu']
         gt_hsi = gt_uHouston['WHU_Hi_HongHu_gt']
         TOTAL_SIZE = 386693
@@ -64,8 +64,8 @@ def load_dataset(Dataset):
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'WHU_LK':
-        uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-LongKou/WHU_Hi_LongKou.mat')
-        gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data (1)/WHU data/WHU-Hi-LongKou/WHU_Hi_LongKou_gt.mat')
+        uHouston = sio.loadmat('/content/drive/MyDrive/Data/WHU data/WHU-Hi-LongKou/WHU_Hi_LongKou.mat')
+        gt_uHouston = sio.loadmat('/content/drive/MyDrive/Data/WHU data/WHU-Hi-LongKou/WHU_Hi_LongKou_gt.mat')
         data_hsi = uHouston['WHU_Hi_LongKou']
         gt_hsi = gt_uHouston['WHU_Hi_LongKou_gt']
         TOTAL_SIZE = 204542
@@ -215,7 +215,7 @@ def list_to_colormap(x_list):
 
 
 def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE, total_indices, VAL_SIZE,
-                  whole_data, PATCH_LENGTH, padded_data, INPUT_DIMENSION, batch_size, gt, device):
+                  whole_data, PATCH_LENGTH, padded_data, INPUT_DIMENSION, batch_size, gt):
 
     gt_all = gt[total_indices] - 1
     y_train = gt[train_indices] - 1
@@ -248,21 +248,21 @@ def generate_iter(TRAIN_SIZE, train_indices, TEST_SIZE, test_indices, TOTAL_SIZE
 
     # print(y1_train)
     #y1_train = to_categorical(y1_train)  # to one-hot labels
-    x1_tensor_train = torch.from_numpy(x_train).type(torch.FloatTensor).unsqueeze(1).to(device)
-    y1_tensor_train = torch.from_numpy(y_train).type(torch.FloatTensor).to(device)
+    x1_tensor_train = torch.from_numpy(x_train).type(torch.FloatTensor).unsqueeze(1)
+    y1_tensor_train = torch.from_numpy(y_train).type(torch.FloatTensor)
     torch_dataset_train = Data.TensorDataset(x1_tensor_train, y1_tensor_train)
 
-    x1_tensor_valida = torch.from_numpy(x_val).type(torch.FloatTensor).unsqueeze(1).to(device)
-    y1_tensor_valida = torch.from_numpy(y_val).type(torch.FloatTensor).to(device)
+    x1_tensor_valida = torch.from_numpy(x_val).type(torch.FloatTensor).unsqueeze(1)
+    y1_tensor_valida = torch.from_numpy(y_val).type(torch.FloatTensor)
     torch_dataset_valida = Data.TensorDataset(x1_tensor_valida, y1_tensor_valida)
 
-    x1_tensor_test = torch.from_numpy(x_test).type(torch.FloatTensor).unsqueeze(1).to(device)
-    y1_tensor_test = torch.from_numpy(y_test).type(torch.FloatTensor).to(device)
+    x1_tensor_test = torch.from_numpy(x_test).type(torch.FloatTensor).unsqueeze(1)
+    y1_tensor_test = torch.from_numpy(y_test).type(torch.FloatTensor)
     torch_dataset_test = Data.TensorDataset(x1_tensor_test,y1_tensor_test)
 
     all_data.reshape(all_data.shape[0], all_data.shape[1], all_data.shape[2], INPUT_DIMENSION)
-    all_tensor_data = torch.from_numpy(all_data).type(torch.FloatTensor).unsqueeze(1).to(device)
-    all_tensor_data_label = torch.from_numpy(gt_all).type(torch.FloatTensor).to(device)
+    all_tensor_data = torch.from_numpy(all_data).type(torch.FloatTensor).unsqueeze(1)
+    all_tensor_data_label = torch.from_numpy(gt_all).type(torch.FloatTensor)
     torch_dataset_all = Data.TensorDataset(all_tensor_data, all_tensor_data_label)
 
 
