@@ -50,6 +50,7 @@ image_x, image_y, BAND = data_hsi.shape
 data = data_hsi.reshape(np.prod(data_hsi.shape[:2]), np.prod(data_hsi.shape[2:]))
 gt = gt_hsi.reshape(np.prod(gt_hsi.shape[:2]),)
 CLASSES_NUM = int(max(gt))
+
 print('The class numbers of the HSI data is:', CLASSES_NUM)
 
 print('-----Importing Setting Parameters-----')
@@ -80,7 +81,7 @@ OA = []
 AA = []
 TRAINING_TIME = []
 TESTING_TIME = []
-ELEMENT_ACC = np.zeros((ITER, CLASSES_NUM))
+ELEMENT_ACC = np.zeros((ITER, 16))
 
 data = preprocessing.scale(data)
 data_ = data.reshape(data_hsi.shape[0], data_hsi.shape[1], data_hsi.shape[2])
@@ -139,6 +140,7 @@ for index_iter in range(ITER):
     TRAINING_TIME.append(diff)
     diff = toc2 - tic2
     TESTING_TIME.append(diff)
+    print(each_acc_fdssc)
     ELEMENT_ACC[index_iter, :] = each_acc_fdssc
 
 print("--------" + net.name + " Training Finished-----------")
