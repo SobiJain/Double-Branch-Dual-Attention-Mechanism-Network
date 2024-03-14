@@ -45,6 +45,14 @@ if(Dataset == 'WHU_HH'):
   data_hsi = data_hsi[700:941, :330, :]
   gt_hsi = gt_hsi[700:941, :330]
 
+if(Dataset == 'WHU_HC'):
+  data_hsi = data_hsi[380:870, 43:253, :]
+  gt_hsi = gt_hsi[380:870, 43:253]
+
+if(Dataset == 'WHU_LK'):
+  data_hsi = data_hsi[200:-100, 40:-60, :]
+  gt_hsi = gt_hsi[200:-100, 40:-60]
+
 print(data_hsi.shape)
 image_x, image_y, BAND = data_hsi.shape
 data = data_hsi.reshape(np.prod(data_hsi.shape[:2]), np.prod(data_hsi.shape[2:]))
