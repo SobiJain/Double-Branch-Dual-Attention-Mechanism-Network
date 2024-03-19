@@ -111,23 +111,25 @@ class SpatAPNBA(nn.Module):
 
         kq = k*q
 
-        kq = kq.reshape(batch_size, self.f, h*w)
+        kq = kq.reshape(batch_size, self.f, self.h*self.w)
+        # print('kq', kq.shape)
         # -------------------------------------------------------------------------
 
         v = self.conv31(X)
 
         v = self.global_pooling21(v)
         v = self.softmax21(v)
+        # print('v', v.shape)
 
         x31 = torch.einsum("bik,bjk->bij", kq, v)
-        print('x31', x31.shape)
+        # print('x31', x31.shape)
 
         x32 = x31.reshape(batch_size, self.h, self.w)
-        print('x32', x32.shape)
+        # print('x32', x32.shape)
         x32 = self.sigmoid31(x32)
 
         output = x32*X
-        print('output', output.shape)
+        # print('output', output.shape)
 
         return output
 
@@ -263,17 +265,17 @@ class SpecFExtraction(nn.Module):
         x14 = self.cpcb(x13)
 
         x15 = torch.cat((x12, x13, x14), dim = 1)
-        print('x15', x15.shape)
+        # print('x15', x15.shape)
 
         x16 = self.Conv_BN_mish12(x15)
-        print('x16', x16.shape)
+        # print('x16', x16.shape)
         x16 = x11+x16
 
 
         x17 = self.Conv_BN_mish13(x16)
-        print('x17', x17.shape)
+        # print('x17', x17.shape)
         output = x17.reshape(batch_size, self.f, self.h, self.w)
-        print('x17', x17.shape)
+        # print('x17', x17.shape)
 
         return output
 
@@ -313,21 +315,21 @@ class SpatFExtraction(nn.Module):
         X = X.reshape(batch_size, 1, channels, self.h, self.w)
 
         x11 = self.Conv_BN_mish11(X)
-        print('x11', x11.shape)
+        # print('x11', x11.shape)
 
         x12 = self.spcb(x11)
         x13 = self.spcb(x12)
         x14 = self.spcb(x13)
 
         x15 = torch.cat((x12, x13, x14), dim = 1)
-        print('x15', x15.shape)
+        # print('x15', x15.shape)
 
         x16 = self.Conv_BN_mish12(x15)
-        print('x16', x16.shape)
+        # print('x16', x16.shape)
         x16 = x11+x16
 
         output = x16.reshape(batch_size, self.f, self.h, self.w)
-        print('output', output.shape)
+        # print('output', output.shape)
 
         return output
 
@@ -349,13 +351,13 @@ class SpecFEnhance(nn.Module):
     def forward(self, X):
 
         x11 = self.specEnhance(X)
-        print("x11", x11.shape)
+        # print("x11", x11.shape)
 
         x12 = self.global_pool_11(x11)
-        print("x12", x12.shape)
+        # print("x12", x12.shape)
 
-        x13 = self.flatten(x13)
-        print("x13", x13.shape)
+        x13 = self.flatten(x12)
+        # print("x13", x13.shape)
 
         return x13
 
@@ -377,13 +379,13 @@ class SpatFEnhance(nn.Module):
     def forward(self, X):
 
         x11 = self.spatEnhance(X)
-        print("x11", x11.shape)
+        # print("x11", x11.shape)
 
         x12 = self.global_pool_11(x11)
-        print("x12", x12.shape)
+        # print("x12", x12.shape)
 
         x13 = self.flatten(x13)
-        print("x13", x13.shape)
+        # print("x13", x13.shape)
 
         return x13
 
@@ -405,28 +407,28 @@ class OSAPAN(nn.Module):
 
         self.SpatFEnhance = SpatFEnhance(self.h, self.w, self.f)
 
-        self.fc = nn.Linear(self.f, classes)
+        self.fc = nn.Linear(2*self.f, classes)
 
     def forward(self, X):
 
         batch_size = X.shape[0]
 
         x11 = self.SpecFExtraction(X)
-        print('x11', x11.shape)
+        # print('x11', x11.shape)
 
         x11 = self.SpecFEnhance(x11)
-        print('x11', x11.shape)
+        # print('x11', x11.shape)
 
         x12 = self.SpecFExtraction(X)
-        print('x12', x12.shape)
+        # print('x12', x12.shape)
 
         x12 = self.SpecFEnhance(x12)
-        print('x12', x12.shape)   
+        # print('x12', x12.shape)   
 
         x13 = torch.cat((x11, x12), dim = 1)
-        print('x13', x13.shape) 
+        # print('x13', x13.shape) 
 
         output = self.fc(x13)
-        print('output', output.shape) 
+        # print('output', output.shape) 
 
         return output
