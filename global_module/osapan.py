@@ -142,9 +142,9 @@ class CPCB(nn.Module):
         self.h = h
         self.w = w
 
-        self.conv11 = nn.Conv3d(self.C, self.C//4, kernel_size=(1,1,1))
-        self.conv21 = nn.Conv3d(self.C, self.C//2, kernel_size=(3,1,1), padding = (1,0,0))
-        self.conv31 = nn.Conv3d(self.C, 3*self.C//4, kernel_size=(5,1,1), padding = (2,0,0))
+        self.conv11 = nn.Conv3d(self.C, self.C//4, kernel_size=(1,1,1), padding = "same")
+        self.conv21 = nn.Conv3d(self.C, self.C//2, kernel_size=(3,1,1), padding = "same")
+        self.conv31 = nn.Conv3d(self.C, 3*self.C//4, kernel_size=(5,1,1), padding = "same")
 
         self.BN_mish = nn.Sequential(
             nn.BatchNorm3d(3*(self.C//2), eps=0.001, momentum=0.1, affine=True),
@@ -184,9 +184,9 @@ class SPCB(nn.Module):
         self.h = h
         self.w = w
 
-        self.conv11 = nn.Conv3d(self.C, self.C//4, kernel_size=(1,1,1), padding=(0,0,0))
-        self.conv21 = nn.Conv3d(self.C, self.C//2, kernel_size=(1,3,3), padding=(0,1,1))
-        self.conv31 = nn.Conv3d(self.C, 3*self.C//4, kernel_size=(1,5,5), padding=(0,2,2))
+        self.conv11 = nn.Conv3d(self.C, self.C//4, kernel_size=(1,1,1), padding = "same")
+        self.conv21 = nn.Conv3d(self.C, self.C//2, kernel_size=(1,3,3), padding = "same")
+        self.conv31 = nn.Conv3d(self.C, 3*self.C//4, kernel_size=(1,5,5), padding = "same")
 
         self.BN_mish = nn.Sequential(
             nn.BatchNorm3d(3*(self.C//2), eps=0.001, momentum=0.1, affine=True),
