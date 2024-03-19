@@ -239,6 +239,9 @@ class SpecFExtraction(nn.Module):
     def forward(self, X):
 
         batch_size = X.shape[0]
+        channels = X.shape[4]
+
+        X = X.reshape(batch_size, 1, channels, self.h, self.w)
 
         x11 = self.Conv_BN_mish11(X)
 
@@ -254,7 +257,7 @@ class SpecFExtraction(nn.Module):
         x16 = x11+x16
 
 
-        x17 = Conv_BN_mish13(x16)
+        x17 = self.Conv_BN_mish13(x16)
         print('x17', x17.shape)
         output = x17.reshape(batch_size, self.h, self.w)
         print('x17', x17.shape)
@@ -292,12 +295,15 @@ class SpatFExtraction(nn.Module):
     def forward(self, X):
 
         batch_size = X.shape[0]
+        channels = X.shape[4]
+
+        X = X.reshape(batch_size, 1, channels, self.h, self.w)
 
         x11 = self.Conv_BN_mish11(X)
 
-        x12 = self.cpcb(x11)
-        x13 = self.cpcb(x12)
-        x14 = self.cpcb(x13)
+        x12 = self.spcb(x11)
+        x13 = self.spcb(x12)
+        x14 = self.spcb(x13)
 
         x15 = torch.cat((x12, x13, x14), dim = 1)
         print('x15', x15.shape)
