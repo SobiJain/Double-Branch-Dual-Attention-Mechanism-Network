@@ -25,11 +25,11 @@ class SpecAPNBA(nn.Module):
         self.conv21 =  nn.Conv2d(self.C, self.f, kernel_size=(1,1), dilation = 2)
         self.conv31 =  nn.Conv2d(self.C, self.f, kernel_size=(1,1), dilation = 1)
 
-        self.adpt_avg_pooling31 = nn.adaptive_avg_pool2d(f, 1)
+        self.adpt_avg_pooling31 = nn.AdaptiveAvgPool2d(1)
         self.softmax31 = nn.Softmax()
 
-        self.conv41 = nn.Conv2d(self.f, self.f//r, kernel_size=(1,1))
-        self.conv42 = nn.Conv2d(self.f//r, self.C, kernel_size=(1,1))
+        self.conv41 = nn.Conv2d(self.f, self.f//self.r, kernel_size=(1,1))
+        self.conv42 = nn.Conv2d(self.f//self.r, self.C, kernel_size=(1,1))
 
         self.LN_relu_sig41 = nn.Sequential(
             nn.LayerNorm(self.C),
@@ -46,14 +46,15 @@ class SpecAPNBA(nn.Module):
 
         kq = k*q
 
-        kq = kq.reshape(batch_size, self.f, 1, h*w)
+        kq = kq.reshape(batch_size, self.f, 1, self.h*self.w)
         # -------------------------------------------------------------------------
 
         v = self.conv31(X)
         v = torch.permute(v, (0, 2, 3, 1))
-        v = v.reshape(batch_size, self.f, 1, h*w)
+        v = v.reshape(batch_size, self.f, 1, self.h*self.w)
 
         v = self.adpt_avg_pooling31(v)
+        print('v', v.shape)
         v = self.softmax31(v)
 
         x41 = torch.einsum("bkij,blik->bijl", kq, v)
@@ -71,7 +72,7 @@ class SpecAPNBA(nn.Module):
 
 class SpatAPNBA(nn.Module):
     def __init__(self, h, w):
-        super(Spatial_PSA, self).__init__()
+        super(SpatAPNBA, self).__init__()
 
         self.name = 'SpatAPNBA'
         self.C = 12
@@ -83,7 +84,7 @@ class SpatAPNBA(nn.Module):
         self.conv21 =  nn.Conv2d(self.C, self.f, kernel_size=(1,1), dilation = 2)
         self.conv31 =  nn.Conv2d(self.C, self.f, kernel_size=(1,1), dilation = 1)
 
-        self.global_pooling21 = nn.adaptive_avg_pool2d(f, 1)
+        self.global_pooling21 = nn.AdaptiveAvgPool2d(1)
         self.softmax21 = nn.Softmax()
 
         self.sigmoid31 = nn.Sigmoid()
@@ -322,7 +323,7 @@ class SpecFEnhance(nn.Module):
 
         self.specEnhance = SpecAPNBA(self.h, self.w, self.f)
 
-        self.global_pool_11 = nn.adaptive_avg_pool2d(f, 1)
+        self.global_pool_11 = nn.AdaptiveAvgPool2d(1)
         self.flatten = nn.Flatten()
 
     def forward(self, X):
@@ -348,9 +349,9 @@ class SpatFEnhance(nn.Module):
         self.w = w
         self.f = 24
 
-        self.spatEnhance = SpatAPNBA(self.h, self.w, self.f)
+        self.spatEnhance = SpatAPNBA(self.h, self.w)
 
-        self.global_pool_11 = nn.adaptive_avg_pool2d(f, 1)
+        self.global_pool_11 = nn.AdaptiveAvgPool2d(1)
         self.flatten = nn.Flatten()
 
     def forward(self, X):
