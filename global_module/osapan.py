@@ -45,28 +45,41 @@ class SpecAPNBA(nn.Module):
         q = self.conv21(X)
 
         kq = k*q
+        # print('kq', kq.shape)
 
         kq = kq.reshape(batch_size, self.f, 1, self.h*self.w)
+        # print('kq', kq.shape)
         # -------------------------------------------------------------------------
 
         v = self.conv31(X)
+        # print('v', v.shape)
         v = torch.permute(v, (0, 2, 3, 1))
-        v = v.reshape(batch_size, self.f, 1, self.h*self.w)
+        # print('v', v.shape)
+        v = v.reshape(batch_size, self.h*self.w, self.f, 1)
+        # print('v', v.shape)
 
         v = self.adpt_avg_pooling31(v)
-        print('v', v.shape)
+        # print('v', v.shape)
         v = self.softmax31(v)
 
-        x41 = torch.einsum("bkij,blik->bijl", kq, v)
+        x41 = torch.einsum("bijk,bkjl->bijl", kq, v)
+        # print('x41', x41.shape)
+
         x41 = self.conv41(x41)
+        # print('x41', x41.shape)
+
         x41 = self.conv42(x41)
-        print('x41', x41.shape)
+        # print('x41', x41.shape)
+
+        x41 = x41.squeeze(-1).squeeze(-1)
 
         x42 = self.LN_relu_sig41(x41)
-        print('x42', x42.shape)
+        # print('x42', x42.shape)
+
+        x42 = x42.unsqueeze(-1).unsqueeze(-1)
 
         output = x42*X
-        print('output', output.shape)
+        # print('output', output.shape)
 
         return output
 
@@ -259,7 +272,7 @@ class SpecFExtraction(nn.Module):
 
         x17 = self.Conv_BN_mish13(x16)
         print('x17', x17.shape)
-        output = x17.reshape(batch_size, self.h, self.w)
+        output = x17.reshape(batch_size, self.f, self.h, self.w)
         print('x17', x17.shape)
 
         return output
@@ -300,6 +313,7 @@ class SpatFExtraction(nn.Module):
         X = X.reshape(batch_size, 1, channels, self.h, self.w)
 
         x11 = self.Conv_BN_mish11(X)
+        print('x11', x11.shape)
 
         x12 = self.spcb(x11)
         x13 = self.spcb(x12)
@@ -312,7 +326,7 @@ class SpatFExtraction(nn.Module):
         print('x16', x16.shape)
         x16 = x11+x16
 
-        output = x16.reshape(batch_size, self.h, self.w)
+        output = x16.reshape(batch_size, self.f, self.h, self.w)
         print('output', output.shape)
 
         return output
@@ -383,7 +397,7 @@ class OSAPAN(nn.Module):
         self.h = 11
         self.w = 11
 
-        self.SpecFExtraction = SpatFExtraction(self.h, self.w, self.f)
+        self.SpecFExtraction = SpecFExtraction(self.h, self.w, self.f)
 
         self.SpecFEnhance = SpecFEnhance(self.h, self.w, self.f)
 
