@@ -62,11 +62,11 @@ CLASSES_NUM = int(max(gt))
 print('The class numbers of the HSI data is:', CLASSES_NUM)
 
 print('-----Importing Setting Parameters-----')
-ITER = 2
+ITER = 1
 PATCH_LENGTH = 5
 # number of training samples per class
 #lr, num_epochs, batch_size = 0.001, 200, 32
-lr, num_epochs, batch_size = 0.00050, 200, 32
+lr, num_epochs, batch_size = 0.00050, 200, 256
 #lr, num_epochs, batch_size = 0.00050, 200, 16
 #lr, num_epochs, batch_size = 0.0005, 200, 12
 #net = network.DBDA_network_drop(BAND, CLASSES_NUM)
