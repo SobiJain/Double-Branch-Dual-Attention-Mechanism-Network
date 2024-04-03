@@ -5,6 +5,8 @@ from torch import optim
 import torch
 from sklearn import metrics, preprocessing
 import datetime
+from torch import nn
+from focal_loss.focal_loss import FocalLoss
 
 import sys
 sys.path.append('../global_module/')
@@ -33,8 +35,6 @@ def params_count(model):
         model (model): model to count the number of parameters.
     """
     return np.sum([p.numel() for p in model.parameters()]).item()
-
-
 
 global Dataset  # UP,IN,KSC
 dataset = input('Please input the name of Dataset(IN, UP, BS, SV, PC or KSC):')
@@ -73,7 +73,8 @@ lr, num_epochs, batch_size = 0.00050, 200, 256
 #net = network.DBDA_network_PReLU(BAND, CLASSES_NUM)
 # net = network.DBMA_network(BAND, CLASSES_NUM)
 # optimizer = optim.Adam(net.parameters(), lr=lr) #, weight_decay=0.0001)
-loss = torch.nn.CrossEntropyLoss()
+# loss = torch.nn.CrossEntropyLoss()
+loss = FocalLoss(gamma=1)
 
 img_rows = 2*PATCH_LENGTH+1
 img_cols = 2*PATCH_LENGTH+1
