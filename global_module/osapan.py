@@ -38,73 +38,79 @@ class CustomGroupedConv3d(nn.Module):
         output = self.activation(output)
         return output
 
-def spectral_one_shot_pyramid_network(input_layer):
-   """
-   Spectral One Shot Pyramid Network (S-OSPN) model in PyTorch.
+class Spectral_one_shot_pyramid_network(nn.Module):
+    def __init__(self):
+        super(Spectral_one_shot_pyramid_network, self).__init__()
 
-   Args:
-       input_layer (torch.Tensor): Input tensor.
+    def forward(self, input_layer):
+      """
+      Spectral One Shot Pyramid Network (S-OSPN) model in PyTorch.
 
-   Returns:
-       torch.Tensor: Output tensor.
-   """
+      Args:
+          input_layer (torch.Tensor): Input tensor.
 
-   # Assuming custom_grouped_conv3d is implemented for PyTorch
-   x1 = CustomGroupedConv3d(in_channel=24, out_channels=12, kernel_size=(1, 1, 5), padding="same")(input_layer)
-   x2 = CustomGroupedConv3d(in_channel=24, out_channels=12, kernel_size=(1, 1, 3), padding="same")(input_layer)
-   x3 = CustomGroupedConv3d(in_channel=24, out_channels=12, kernel_size=(1, 1, 1), padding="same")(input_layer)
+      Returns:
+          torch.Tensor: Output tensor.
+      """
 
-   x4 = torch.cat([x1, x2, x3], dim=1)
-   x4 = nn.BatchNorm3d(num_features=36, eps=1e-3, momentum=0.1)(x4)
-   x4 = Mish()(x4)  # Assuming mish activation is available
+      # Assuming custom_grouped_conv3d is implemented for PyTorch
+      x1 = CustomGroupedConv3d(in_channel=24, out_channels=12, kernel_size=(1, 1, 5), padding="same")(input_layer)
+      x2 = CustomGroupedConv3d(in_channel=24, out_channels=12, kernel_size=(1, 1, 3), padding="same")(input_layer)
+      x3 = CustomGroupedConv3d(in_channel=24, out_channels=12, kernel_size=(1, 1, 1), padding="same")(input_layer)
 
-   x5 = CustomGroupedConv3d(in_channel=36, out_channels=24, kernel_size=(1, 1, 1), padding="same")(x4)
-   x5 = nn.BatchNorm3d(num_features=24, eps=1e-3, momentum=0.1)(x5)
-   x5 = Mish()(x5)
+      x4 = torch.cat([x1, x2, x3], dim=1)
+      x4 = nn.BatchNorm3d(num_features=36, eps=1e-3, momentum=0.1)(x4)
+      x4 = Mish()(x4)  # Assuming mish activation is available
 
-   return x5
+      x5 = CustomGroupedConv3d(in_channel=36, out_channels=24, kernel_size=(1, 1, 1), padding="same")(x4)
+      x5 = nn.BatchNorm3d(num_features=24, eps=1e-3, momentum=0.1)(x5)
+      x5 = Mish()(x5)
 
-import torch
-import torch.nn as nn
+      return x5
 
-def spectral_one_shot_dense_pyramid_network(input_layer):
-    """
-    Spectral One Shot Dense Network (S-OSDPN) model.
+class Spectral_one_shot_dense_pyramid_network(nn.Module):
+    def __init__(self):
+        super(Spectral_one_shot_dense_pyramid_network, self).__init__()
 
-    Args:
-        input_layer: Input layer of the model (tensor).
+    def forward(self, input_layer):
+      """
+      Spectral One Shot Dense Network (S-OSDPN) model.
 
-    Returns:
-        Output layer of the block (tensor).
-    """
+      Args:
+          input_layer: Input layer of the model (tensor).
 
-    print('X', input_layer.shape)
+      Returns:
+          Output layer of the block (tensor).
+      """
 
-    # Convolutional layer 1
-    x1 = nn.Conv3d(in_channels=input_layer.shape[1], out_channels=24, kernel_size=(1, 1, 7), stride=(1, 1, 2))(input_layer)
-    x1 = nn.BatchNorm3d(num_features=24, eps=0.001, momentum=0.1, track_running_stats=True)(x1)  # Ensure tracking running stats
-    x1 = Mish()(x1)
+      print('X', input_layer.shape)
 
-    # Convolutional layers 2-4 with spectral_one_shot_pyramid_network
-    x2 = spectral_one_shot_pyramid_network(x1)
-    x3 = spectral_one_shot_pyramid_network(x2)
-    x4 = spectral_one_shot_pyramid_network(x3)
+      # Convolutional layer 1
+      x1 = nn.Conv3d(in_channels=1, out_channels=24, kernel_size=(1, 1, 7), stride=(1, 1, 2))(input_layer)
+      x1 = nn.BatchNorm3d(num_features=24, eps=0.001, momentum=0.1, track_running_stats=True)(x1)  # Ensure tracking running stats
+      x1 = Mish()(x1)
 
-    # Concatenation and subsequent layers
-    x5 = torch.cat([x2, x3, x4], dim=1)
-    x6 = nn.Conv3d(in_channels=x5.shape[1], out_channels=24, kernel_size=(1, 1, 1))(x5)
-    x6 = nn.BatchNorm3d(num_features=24, eps=0.001, momentum=0.1, track_running_stats=True)(x6)
-    x6 = Mish()(x6)
-    x6 = x1 + x6  # Perform element-wise addition
+      # Convolutional layers 2-4 with spectral_one_shot_pyramid_network
+      x2 = Spectral_one_shot_pyramid_network()(x1)
+      x3 = Spectral_one_shot_pyramid_network()(x2)
+      x4 = Spectral_one_shot_pyramid_network()(x3)
 
-    x7 = nn.Conv3d(in_channels=24, out_channels=24, kernel_size=(1, 1, 132))(x6)
-    x7 = nn.BatchNorm3d(num_features=24, eps=0.001, momentum=0.1, track_running_stats=True)(x7)
-    x7 = Mish()(x7)
+      # Concatenation and subsequent layers
+      x5 = torch.cat([x2, x3, x4], dim=1)
+      x6 = nn.Conv3d(in_channels=x5.shape[1], out_channels=24, kernel_size=(1, 1, 1))(x5)
+      x6 = nn.BatchNorm3d(num_features=24, eps=0.001, momentum=0.1, track_running_stats=True)(x6)
+      x6 = Mish()(x6)
+      x6 = x1 + x6  # Perform element-wise addition
 
-    w1_shape = x7.shape
-    x7 = x7.view(w1_shape[0], w1_shape[1], w1_shape[2], -1)  # Reshape using view
+      x7 = nn.Conv3d(in_channels=24, out_channels=24, kernel_size=(1, 1, 132))(x6)
+      x7 = nn.BatchNorm3d(num_features=24, eps=0.001, momentum=0.1, track_running_stats=True)(x7)
+      x7 = Mish()(x7)
 
-    return x7
+      w1_shape = x7.shape
+      x7 = x7.view(w1_shape[0], w1_shape[1], w1_shape[2], -1)  # Reshape using view
+
+      return x7
+    
 
 r = 2
 
@@ -146,86 +152,89 @@ class Copa(nn.Module):
         x6 = self.global_pool(x5)
         return x6
 
-def spatial_one_shot_pyramid_network(input_layer):
-    """
-    Spatial One Shot Pyramid Network (Sa-OSPN) block in PyTorch.
+class Spatial_one_shot_pyramid_network(nn.Module):
+    def __init__(self):
+        super(Spatial_one_shot_pyramid_network, self).__init__()
 
-    Args:
-        input_layer: Input tensor.
+    def forward(self, input_layer):
+      """
+      Spatial One Shot Pyramid Network (Sa-OSPN) block in PyTorch.
 
-    Returns:
-        Output tensor of the block.
-    """
+      Args:
+          input_layer: Input tensor.
 
-    # Convolutional layers with grouped convolutions
-    x1 = CustomGroupedConv3d(in_channel=12, out_channels=6, kernel_size=(5, 5, 1), padding="same")(input_layer)
-    x2 = CustomGroupedConv3d(in_channel=12, out_channels=6, kernel_size=(3, 3, 1), padding="same")(input_layer)
-    x3 = CustomGroupedConv3d(in_channel=12, out_channels=6, kernel_size=(1, 1, 1), padding="same")(input_layer)
+      Returns:
+          Output tensor of the block.
+      """
 
-    # Concatenation and activation
-    x4 = torch.cat([x1, x2, x3], dim=1)  # Concatenation along channel dimension
-    x4 = nn.BatchNorm3d(x4.shape[1])(x4)  # Batch normalization
-    x4 = Mish()(x4)  # Mish activation
+      # Convolutional layers with grouped convolutions
+      x1 = CustomGroupedConv3d(in_channel=12, out_channels=6, kernel_size=(5, 5, 1), padding="same")(input_layer)
+      x2 = CustomGroupedConv3d(in_channel=12, out_channels=6, kernel_size=(3, 3, 1), padding="same")(input_layer)
+      x3 = CustomGroupedConv3d(in_channel=12, out_channels=6, kernel_size=(1, 1, 1), padding="same")(input_layer)
 
-    # Final convolution
-    x5 = CustomGroupedConv3d(in_channel=36, out_channels=12, kernel_size=(1, 1, 1), padding="same")(x4)
-    x5 = nn.BatchNorm3d(x4.shape[1])(x5)  # Batch normalization
-    x5 = Mish()(x5)  # Mish activation
+      # Concatenation and activation
+      x4 = torch.cat([x1, x2, x3], dim=1)  # Concatenation along channel dimension
+      x4 = nn.BatchNorm3d(x4.shape[1])(x4)  # Batch normalization
+      x4 = Mish()(x4)  # Mish activation
 
-    return x5
+      # Final convolution
+      x5 = CustomGroupedConv3d(in_channel=36, out_channels=12, kernel_size=(1, 1, 1), padding="same")(x4)
+      x5 = nn.BatchNorm3d(x4.shape[1])(x5)  # Batch normalization
+      x5 = Mish()(x5)  # Mish activation
 
-def spatial_one_shot_dense_pyramidal_network(input_layer):
-    """
-    Spatial One Shot Dense Network (Sa-OSDN) model in PyTorch.
+      return x5
 
-    Args:
-        input_layer: Input tensor of shape (batch_size, channels, H, W, D).
+class Spatial_one_shot_dense_pyramid_network(nn.Module):
+    def __init__(self):
+        super(Spatial_one_shot_dense_pyramid_network, self).__init__()
 
-    Returns:
-        Output tensor of the block.
-    """
+    def forward(self, input_layer):
+      """
+      Spatial One Shot Dense Network (Sa-OSDN) model in PyTorch.
 
-    # Define essential modules for clarity and consistency
-    conv3d = nn.Conv3d
-    bn = nn.BatchNorm3d
-    mish = Mish()  # Assuming Mish activation is available
+      Args:
+          input_layer: Input tensor of shape (batch_size, channels, H, W, D).
 
-    # Convolutional layer 1
-    x1 = conv3d(in_channels=input_layer.shape[1], out_channels=12, kernel_size=(1, 1, 270))(input_layer)
-    x1 = bn(x1)
-    x1 = mish(x1)
+      Returns:
+          Output tensor of the block.
+      """
 
-    # Convolutional layer 2-4 (assuming `spatial_one_shot_pyramid_network` is defined elsewhere)
-    x2 = spatial_one_shot_pyramid_network(x1)
-    x2 = bn(x2)
-    x2 = mish(x2)
+      # Define essential modules for clarity and consistency
+      conv3d = nn.Conv3d
+      bn = nn.BatchNorm3d
+      mish = Mish()  # Assuming Mish activation is available
 
-    x3 = spatial_one_shot_pyramid_network(x2)
-    x3 = bn(x3)
-    x3 = mish(x3)
+      # Convolutional layer 1
+      x1 = conv3d(in_channels=input_layer.shape[1], out_channels=12, kernel_size=(1, 1, 270))(input_layer)
+      x1 = bn(x1)
+      x1 = mish(x1)
 
-    x4 = spatial_one_shot_pyramid_network(x3)
-    x4 = bn(x4)
-    x4 = mish(x4)
+      # Convolutional layer 2-4 (assuming `spatial_one_shot_pyramid_network` is defined elsewhere)
+      x2 = Spatial_one_shot_pyramid_network()(x1)
+      x2 = bn(x2)
+      x2 = mish(x2)
 
-    # Convolutional layer 5
-    x5 = torch.cat([x2, x3, x4], dim=1)  # Concatenate along channel dimension
+      x3 = Spatial_one_shot_pyramid_network()(x2)
+      x3 = bn(x3)
+      x3 = mish(x3)
 
-    # Convolutional layer 6
-    x6 = conv3d(in_channels=x5.shape[1], out_channels=12, kernel_size=(1, 1, 1))(x5)
-    x6 = bn(x6)
-    x6 = mish(x6)
-    x6 = x1 + x6  # Element-wise addition (no need for `Add()` module in PyTorch)
+      x4 = Spatial_one_shot_pyramid_network()(x3)
+      x4 = bn(x4)
+      x4 = mish(x4)
 
-    # Reshape
-    x7 = x6.view(x6.shape[0], x6.shape[1], x6.shape[2], x6.shape[4])  # Reshape using view()
+      # Convolutional layer 5
+      x5 = torch.cat([x2, x3, x4], dim=1)  # Concatenate along channel dimension
 
-    return x7
+      # Convolutional layer 6
+      x6 = conv3d(in_channels=x5.shape[1], out_channels=12, kernel_size=(1, 1, 1))(x5)
+      x6 = bn(x6)
+      x6 = mish(x6)
+      x6 = x1 + x6  # Element-wise addition (no need for `Add()` module in PyTorch)
 
-import torch
-from torch import nn
-from torch.nn import functional as F
+      # Reshape
+      x7 = x6.view(x6.shape[0], x6.shape[1], x6.shape[2], x6.shape[4])  # Reshape using view()
 
+      return x7
 
 class SoPAAtrous(nn.Module):
     def __init__(self, window_size):
@@ -233,9 +242,9 @@ class SoPAAtrous(nn.Module):
         self.window_size = window_size
 
         # Replace Conv2D with nn.Conv2d, adjust filters and kernel size
-        self.conv1_k = nn.Conv2d(in_channels=input.shape[1], out_channels=6, kernel_size=1, dilation=4, padding="same")
-        self.conv1_q = nn.Conv2d(in_channels=input.shape[1], out_channels=6, kernel_size=1, dilation=2, padding="same")
-        self.conv1_v = nn.Conv2d(in_channels=input.shape[1], out_channels=6, kernel_size=1, dilation=1, padding="same")
+        self.conv1_k = nn.Conv2d(in_channels=12, out_channels=6, kernel_size=1, dilation=4, padding="same")
+        self.conv1_q = nn.Conv2d(in_channels=12, out_channels=6, kernel_size=1, dilation=2, padding="same")
+        self.conv1_v = nn.Conv2d(in_channels=12, out_channels=6, kernel_size=1, dilation=1, padding="same")
 
         # Use nn.AdaptiveAvgPool2d instead of GlobalAveragePooling2D for flexibility
         self.pool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
@@ -275,17 +284,17 @@ class LogOSPN(nn.Module):
 
     def forward(self, input_layer):
 
-        b1 = spectral_one_shot_dense_pyramid_network(input_layer)
+        b1 = Spectral_one_shot_dense_pyramid_network()(input_layer)
         res1 = self.copa(b1)
 
-        b2 = spatial_one_shot_dense_pyramidal_network(input_layer)
+        b2 = Spatial_one_shot_dense_pyramidal_network()(input_layer)
         res2 = self.sopa(b2)
 
         result = torch.cat([res1, res2], dim=1)  # Concatenate along channel dimension
 
         flatten_layer = result.view(result.size(0), -1)  # Flatten
 
-        output_layer = nn.Linear(flatten_layer.shape[1], output_units)(flatten_layer)  # Dense layer
+        output_layer = nn.Linear(flatten_layer.shape[1], self.output_units)(flatten_layer)  # Dense layer
         output_layer = nn.Softmax()(output_layer)
 
         return output_layer      
