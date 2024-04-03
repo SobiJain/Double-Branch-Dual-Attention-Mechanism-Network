@@ -87,7 +87,7 @@ def load_dataset(Dataset):
         data_hsi = KSC['KSC']
         gt_hsi = gt_KSC['KSC_gt']
         TOTAL_SIZE = 5211
-        VALIDATION_SPLIT = 0.90
+        VALIDATION_SPLIT = 0.98
         TRAIN_SIZE = math.ceil(TOTAL_SIZE * VALIDATION_SPLIT)
 
     if Dataset == 'BS':
