@@ -284,7 +284,7 @@ class SpecFExtraction(nn.Module):
         )
 
         self.Conv_BN_mish12 = nn.Sequential(
-            nn.Conv3d(3*self.f, self.f, kernel_size=(1, 1, 1)),
+            nn.Conv3d(2*self.f, self.f, kernel_size=(1, 1, 1)),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             mish()
         )
@@ -304,10 +304,10 @@ class SpecFExtraction(nn.Module):
         # print('x11', x11.shape)
 
         x12 = self.cpcb(x11)
-        x13 = self.cpcb(x12)
-        x14 = self.cpcb(x13)
+        # x13 = self.cpcb(x12)
+        x14 = self.cpcb(x12)
 
-        x15 = torch.cat((x12, x13, x14), dim = 1)
+        x15 = torch.cat((x12, x14), dim = 1)
         # print('x15', x15.shape)
 
         x16 = self.Conv_BN_mish12(x15)
@@ -333,7 +333,7 @@ class SpatFExtraction(nn.Module):
         self.f = 12
 
         self.Conv_BN_mish11 = nn.Sequential(
-            nn.Conv3d(1, self.f, kernel_size=(1, 1, 103)),
+            nn.Conv3d(1, self.f, kernel_size=(1, 1, 176)),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             mish()
         )
@@ -345,7 +345,7 @@ class SpatFExtraction(nn.Module):
         )
 
         self.Conv_BN_mish12 = nn.Sequential(
-            nn.Conv3d(3*self.f, self.f, kernel_size=(1, 1, 1)),
+            nn.Conv3d(2*self.f, self.f, kernel_size=(1, 1, 1)),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
             mish()
         )
@@ -359,10 +359,10 @@ class SpatFExtraction(nn.Module):
         # print('x11', x11.shape)
 
         x12 = self.spcb(x11)
-        x13 = self.spcb(x12)
-        x14 = self.spcb(x13)
+        # x13 = self.spcb(x12)
+        x14 = self.spcb(x12)
 
-        x15 = torch.cat((x12, x13, x14), dim = 1)
+        x15 = torch.cat((x12, x14), dim = 1)
         # print('x15', x15.shape)
 
         x16 = self.Conv_BN_mish12(x15)
