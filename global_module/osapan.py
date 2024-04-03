@@ -192,13 +192,13 @@ class CPCB(nn.Module):
 
         self.BN_mish = nn.Sequential(
             nn.BatchNorm3d(3*(self.C//2), eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
         self.Conv_BN_mish = nn.Sequential(
             CustomGroupedConv3d(3*(self.C//2), self.C, kernel_size=(1, 1, 1)),
             nn.BatchNorm3d(self.C, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
     def forward(self, X):
@@ -234,13 +234,13 @@ class SPCB(nn.Module):
 
         self.BN_mish = nn.Sequential(
             nn.BatchNorm3d(3*(self.C//2), eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
         self.Conv_BN_mish = nn.Sequential(
             CustomGroupedConv3d(3*(self.C//2), self.C, kernel_size=(1, 1, 1)),
             nn.BatchNorm3d(self.C, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
     def forward(self, X):
@@ -280,19 +280,19 @@ class SpecFExtraction(nn.Module):
         self.cpcb =nn.Sequential(
             CPCB(self.h, self.w, self.f),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
         self.Conv_BN_mish12 = nn.Sequential(
             nn.Conv3d(2*self.f, self.f, kernel_size=(1, 1, 1)),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
         self.Conv_BN_mish13 = nn.Sequential(
             nn.Conv3d(self.f,self.f, kernel_size=(1, 1, 85)),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
     def forward(self, X):
@@ -335,19 +335,19 @@ class SpatFExtraction(nn.Module):
         self.Conv_BN_mish11 = nn.Sequential(
             nn.Conv3d(1, self.f, kernel_size=(1, 1, 176)),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
         self.spcb =nn.Sequential(
             SPCB(self.h, self.w, self.f),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
         self.Conv_BN_mish12 = nn.Sequential(
             nn.Conv3d(2*self.f, self.f, kernel_size=(1, 1, 1)),
             nn.BatchNorm3d(self.f, eps=0.001, momentum=0.1, affine=True),
-            mish()
+            Mish()
         )
 
     def forward(self, X):
