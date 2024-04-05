@@ -191,7 +191,7 @@ class CDCNN_network(nn.Module):
 class DBDA_Separable_network(nn.Module):
     def __init__(self, band, classes):
         super(DBDA_Separable_network, self).__init__()
-
+        self.name = 'DBDA_Separable_network'
         self.conv11 = Separable_Convolution(in_channels=1, out_channels=24, padding=0,
                                 kernel_size=(1, 1, 7), stride=(1, 1, 2))
         # Dense block
